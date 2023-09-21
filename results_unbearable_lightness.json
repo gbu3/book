@@ -1,0 +1,851 @@
+{
+  "kind": "books#volumes",
+  "totalItems": 1898,
+  "items": [
+    {
+      "kind": "books#volume",
+      "id": "n053EAAAQBAJ",
+      "etag": "sNTubtk1h68",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/n053EAAAQBAJ",
+      "volumeInfo": {
+        "title": "The Unbearable Lightness of Being",
+        "subtitle": "A Novel",
+        "authors": [
+          "Milan Kundera"
+        ],
+        "publisher": "HarperCollins",
+        "publishedDate": "2023-03-28",
+        "description": "“Far more than a conventional novel. It is a meditation on life, on the erotic, on the nature of men and women and love . . . full of telling details, truths large and small, to which just about every reader will respond.” — People In The Unbearable Lightness of Being, Milan Kundera tells the story of two couples, a young woman in love with a man torn between his love for her and his incorrigible womanizing, and one of his mistresses and her humbly faithful lover. In a world in which lives are shaped by irrevocable choices and by fortuitous events, a world in which everything occurs but once, existence seems to lose its substance, its weight. Hence, we feel \"the unbearable lightness of being\" not only as the consequence of our pristine actions but also in the public sphere, and the two inevitably intertwine. This magnificent novel is a story of passion and politics, infidelity and ideas, and encompasses the extremes of comedy and tragedy, illuminating all aspects of human existence.",
+        "industryIdentifiers": [
+          {
+            "type": "ISBN_13",
+            "identifier": "9780063290648"
+          },
+          {
+            "type": "ISBN_10",
+            "identifier": "0063290642"
+          }
+        ],
+        "readingModes": {
+          "text": true,
+          "image": false
+        },
+        "pageCount": 311,
+        "printType": "BOOK",
+        "categories": [
+          "Fiction"
+        ],
+        "averageRating": 3.5,
+        "ratingsCount": 102,
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": true,
+        "contentVersion": "1.2.2.0.preview.2",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=n053EAAAQBAJ&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=n053EAAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=n053EAAAQBAJ&printsec=frontcover&dq=the+unbearable+lightness+of+being&hl=&cd=1&source=gbs_api",
+        "infoLink": "https://play.google.com/store/books/details?id=n053EAAAQBAJ&source=gbs_api",
+        "canonicalVolumeLink": "https://play.google.com/store/books/details?id=n053EAAAQBAJ"
+      },
+      "saleInfo": {
+        "country": "US",
+        "saleability": "FOR_SALE",
+        "isEbook": true,
+        "listPrice": {
+          "amount": 12.99,
+          "currencyCode": "USD"
+        },
+        "retailPrice": {
+          "amount": 12.99,
+          "currencyCode": "USD"
+        },
+        "buyLink": "https://play.google.com/store/books/details?id=n053EAAAQBAJ&rdid=book-n053EAAAQBAJ&rdot=1&source=gbs_api",
+        "offers": [
+          {
+            "finskyOfferType": 1,
+            "listPrice": {
+              "amountInMicros": 12990000,
+              "currencyCode": "USD"
+            },
+            "retailPrice": {
+              "amountInMicros": 12990000,
+              "currencyCode": "USD"
+            },
+            "giftable": true
+          }
+        ]
+      },
+      "accessInfo": {
+        "country": "US",
+        "viewability": "PARTIAL",
+        "embeddable": true,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": true,
+          "acsTokenLink": "http://books.google.com/books/download/The_Unbearable_Lightness_of_Being-sample-epub.acsm?id=n053EAAAQBAJ&format=epub&output=acs4_fulfillment_token&dl_type=sample&source=gbs_api"
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=n053EAAAQBAJ&hl=&source=gbs_api",
+        "accessViewStatus": "SAMPLE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "This magnificent novel is a story of passion and politics, infidelity and ideas, and encompasses the extremes of comedy and tragedy, illuminating all aspects of human existence."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "7QpErH6s8hcC",
+      "etag": "iz93RmYqOhE",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/7QpErH6s8hcC",
+      "volumeInfo": {
+        "title": "The Unbearable Lightness of Being",
+        "subtitle": "Twentieth Anniversary Edition",
+        "authors": [
+          "Milan Kundera"
+        ],
+        "publisher": "Harper Collins",
+        "publishedDate": "2004-05-04",
+        "description": "When The Unbearable Lightness of Being was first published in English, it was hailed as \"a work of the boldest mastery, originality, and richness\" by critic Elizabeth Hardwick and named one of the best books of 1984 by the New York Times Book Review. It went on to win the Los Angeles Times Book Prize for Fiction and quickly became an international bestseller. Twenty years later, the novel has established itself as a modern classic. To commemorate the anniversary of its first English-language publication, HarperCollins is proud to offer a special hardcover edition. A young woman in love with a man torn between his love for her and his incorrigible womanizing; one of his mistresses and her humbly faithful lover -- these are the two couples whose story is told in this masterful novel. Controlled by day, Tereza's jealousy awakens by night, transformed into ineffably sad death-dreams, while Tomas, a successful surgeon, alternates loving devotion to the dependent Tereza with the ardent pursuit of other women. Sabina, an independent, free-spirited artist, lives her life as a series of betrayals -- of parents, husband, country, love itself -- whereas her lover, the intellectual Franz, loses all because of his earnest goodness and fidelity. In a world in which lives are shaped by irrevocable choices and by fortuitous events, a world in which everything occurs but once, existence seems to lose its substance, its weight. Hence we feel, says the novelist, \"the unbearable lightness of being\" -- not only as the consequence of our private acts but also in the public sphere, and the two inevitably intertwine. This magnificent novel encompasses the extremes of comedy and tragedy, and embraces, it seems, all aspects of human existence. It juxtaposes geographically distant places (Prague, Geneva, Paris, Thailand, the United States, a forlorn Bohemian village); brilliant and playful reflections (on \"eternal return,\" on kitsch, on man and animals -- Tomas and Tereza have a beloved doe named Karenin); and a variety of styles (from the farcical to the elegiac) to take its place as perhaps the major achievement of one of the world's truly great writers.",
+        "industryIdentifiers": [
+          {
+            "type": "ISBN_13",
+            "identifier": "9780060597184"
+          },
+          {
+            "type": "ISBN_10",
+            "identifier": "0060597186"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 324,
+        "printType": "BOOK",
+        "categories": [
+          "Fiction"
+        ],
+        "averageRating": 3.5,
+        "ratingsCount": 103,
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "0.1.1.0.preview.0",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=7QpErH6s8hcC&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=7QpErH6s8hcC&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=7QpErH6s8hcC&printsec=frontcover&dq=the+unbearable+lightness+of+being&hl=&cd=2&source=gbs_api",
+        "infoLink": "http://books.google.com/books?id=7QpErH6s8hcC&dq=the+unbearable+lightness+of+being&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/The_Unbearable_Lightness_of_Being.html?hl=&id=7QpErH6s8hcC"
+      },
+      "saleInfo": {
+        "country": "US",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "US",
+        "viewability": "PARTIAL",
+        "embeddable": true,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=7QpErH6s8hcC&hl=&source=gbs_api",
+        "accessViewStatus": "SAMPLE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "When The Unbearable Lightness of Being was first published in English, it was hailed as &quot;a work of the boldest mastery, originality, and richness&quot; by critic Elizabeth Hardwick and named one of the best books of 1984 by the New York Times ..."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "Ufv_DwAAQBAJ",
+      "etag": "40E2eKSEj2A",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/Ufv_DwAAQBAJ",
+      "volumeInfo": {
+        "title": "The Unbearable Lightness of Being",
+        "authors": [
+          "Milan Kundera"
+        ],
+        "publisher": "Faber & Faber",
+        "publishedDate": "2020-11-09",
+        "description": "'A cult figure.' Guardian'A dark and brilliant achievement.' Ian McEwan'Shamelessly clever ... Exhilaratingly subversive and funny.' Independent'A modern classic ... As relevant now as when it was first published. ' John BanvilleA young woman is in love with a successful surgeon; a man torn between his love for her and his womanising. His mistress, a free-spirited artist, lives her life as a series of betrayals; while her other lover stands to lose everything because of his noble qualities. In a world where lives are shaped by choices and events, and everything occurs but once, existence seems to lose its substance and weight - and we feel 'the unbearable lightness of being'.The Unbearable Lightness of Being encompasses passion and philosophy, infidelity and ideas, the Prague Spring and modern America, political acts and private desires, comedy and tragedy - in fact, all of human existence.What readers are saying:'Some books change your mind, some change your heart, the very best change your whole world ... A mighty piece of work, that will shape your life forever.''One of the best books I've ever read ... A book about love and life, full of surprises. Beautiful.''This book is going to change your life ... It definitely leaves you with a hangover after you're done reading.''A must read - loved it, such beautiful observations on life, love and sexuality.''Kundera writes about love as if in a trance so the beauty of it is enchanting and dreamy ... Will stay with you forever.''A beautiful novel that helps you understand life better ... Loved it.''One of those rare novels full of depth and insight into the human condition ... Got me reading Camus and Sartre.''One of the best books I have ever read ... An intellectual love story if ever there was one.'",
+        "industryIdentifiers": [
+          {
+            "type": "ISBN_13",
+            "identifier": "9780571367641"
+          },
+          {
+            "type": "ISBN_10",
+            "identifier": "057136764X"
+          }
+        ],
+        "readingModes": {
+          "text": true,
+          "image": false
+        },
+        "pageCount": 309,
+        "printType": "BOOK",
+        "categories": [
+          "Fiction"
+        ],
+        "averageRating": 3.5,
+        "ratingsCount": 102,
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": true,
+        "contentVersion": "1.3.3.0.preview.2",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=Ufv_DwAAQBAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=Ufv_DwAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=Ufv_DwAAQBAJ&dq=the+unbearable+lightness+of+being&hl=&cd=3&source=gbs_api",
+        "infoLink": "http://books.google.com/books?id=Ufv_DwAAQBAJ&dq=the+unbearable+lightness+of+being&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/The_Unbearable_Lightness_of_Being.html?hl=&id=Ufv_DwAAQBAJ"
+      },
+      "saleInfo": {
+        "country": "US",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "US",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": true
+        },
+        "pdf": {
+          "isAvailable": true
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=Ufv_DwAAQBAJ&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "A mighty piece of work, that will shape your life forever.&#39; &#39;One of the best books I&#39;ve ever read ... A book about love and life, full of surprises. Beautiful.&#39; &#39;This book is going to change your life ."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "NKB_CgAAQBAJ",
+      "etag": "u+aLEYuX9LE",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/NKB_CgAAQBAJ",
+      "volumeInfo": {
+        "title": "A Study Guide for Milan Kundera's The Unbearable Lightness of Being",
+        "authors": [
+          "Gale, Cengage Learning"
+        ],
+        "publisher": "Gale, Cengage Learning ",
+        "publishedDate": "2015-09-15",
+        "description": "A Study Guide for Milan Kundera's \"The Unbearable Lightness of Being,\" excerpted from Gale's acclaimed Novels for Students.This concise study guide includes plot summary; character analysis; author biography; study questions; historical context; suggestions for further reading; and much more. For any literature project, trust Novels for Students for all of your research needs.",
+        "industryIdentifiers": [
+          {
+            "type": "ISBN_13",
+            "identifier": "9781410336798"
+          },
+          {
+            "type": "ISBN_10",
+            "identifier": "1410336794"
+          }
+        ],
+        "readingModes": {
+          "text": true,
+          "image": true
+        },
+        "pageCount": 15,
+        "printType": "BOOK",
+        "categories": [
+          "Literary Criticism"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": true,
+        "contentVersion": "1.3.4.0.preview.3",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=NKB_CgAAQBAJ&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=NKB_CgAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=NKB_CgAAQBAJ&printsec=frontcover&dq=the+unbearable+lightness+of+being&hl=&cd=4&source=gbs_api",
+        "infoLink": "https://play.google.com/store/books/details?id=NKB_CgAAQBAJ&source=gbs_api",
+        "canonicalVolumeLink": "https://play.google.com/store/books/details?id=NKB_CgAAQBAJ"
+      },
+      "saleInfo": {
+        "country": "US",
+        "saleability": "FOR_SALE",
+        "isEbook": true,
+        "listPrice": {
+          "amount": 3.99,
+          "currencyCode": "USD"
+        },
+        "retailPrice": {
+          "amount": 3.99,
+          "currencyCode": "USD"
+        },
+        "buyLink": "https://play.google.com/store/books/details?id=NKB_CgAAQBAJ&rdid=book-NKB_CgAAQBAJ&rdot=1&source=gbs_api",
+        "offers": [
+          {
+            "finskyOfferType": 1,
+            "listPrice": {
+              "amountInMicros": 3990000,
+              "currencyCode": "USD"
+            },
+            "retailPrice": {
+              "amountInMicros": 3990000,
+              "currencyCode": "USD"
+            },
+            "giftable": true
+          }
+        ]
+      },
+      "accessInfo": {
+        "country": "US",
+        "viewability": "PARTIAL",
+        "embeddable": true,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": true,
+          "acsTokenLink": "http://books.google.com/books/download/A_Study_Guide_for_Milan_Kundera_s_The_Un-sample-epub.acsm?id=NKB_CgAAQBAJ&format=epub&output=acs4_fulfillment_token&dl_type=sample&source=gbs_api"
+        },
+        "pdf": {
+          "isAvailable": true,
+          "acsTokenLink": "http://books.google.com/books/download/A_Study_Guide_for_Milan_Kundera_s_The_Un-sample-pdf.acsm?id=NKB_CgAAQBAJ&format=pdf&output=acs4_fulfillment_token&dl_type=sample&source=gbs_api"
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=NKB_CgAAQBAJ&hl=&source=gbs_api",
+        "accessViewStatus": "SAMPLE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "A Study Guide for Milan Kundera&#39;s &quot;The Unbearable Lightness of Being,&quot; excerpted from Gale&#39;s acclaimed Novels for Students.This concise study guide includes plot summary; character analysis; author biography; study questions; historical ..."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "i352L03hNqQC",
+      "etag": "3gaOUnandhg",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/i352L03hNqQC",
+      "volumeInfo": {
+        "title": "Unbearable Lightness",
+        "subtitle": "A Story of Loss and Gain",
+        "authors": [
+          "Portia de Rossi"
+        ],
+        "publisher": "Simon and Schuster",
+        "publishedDate": "2011-03-03",
+        "description": "\"I didn't decide to become anorexic. It snuck up on me disguised as a healthy diet, a professional attitude. Although there was a certain glamour to anorexics, I didn't want to be one. I just wanted to excel in dieting. And weighing in at 80 pounds on 300 calories a day, I was the best little dieter there ever was.\" In scalding prose, Portia de Rossi reveals the pain and illness that haunted her for decades. She alternately starved herself and binged, putting her life in danger and lying to herself and everyone around her about the depth of her illness. From her lowest point, Portia began the painful climb back to health and happiness, ultimately falling head over heels in love with Ellen DeGeneres. In this remarkable and landmark book, she tells a story that inspires hope and nourishes the spirit.",
+        "industryIdentifiers": [
+          {
+            "type": "ISBN_13",
+            "identifier": "9781849835275"
+          },
+          {
+            "type": "ISBN_10",
+            "identifier": "1849835276"
+          }
+        ],
+        "readingModes": {
+          "text": true,
+          "image": false
+        },
+        "pageCount": 320,
+        "printType": "BOOK",
+        "categories": [
+          "Biography & Autobiography"
+        ],
+        "averageRating": 4,
+        "ratingsCount": 38,
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": true,
+        "contentVersion": "3.7.5.0.preview.2",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=i352L03hNqQC&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=i352L03hNqQC&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=i352L03hNqQC&printsec=frontcover&dq=the+unbearable+lightness+of+being&hl=&cd=5&source=gbs_api",
+        "infoLink": "http://books.google.com/books?id=i352L03hNqQC&dq=the+unbearable+lightness+of+being&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/Unbearable_Lightness.html?hl=&id=i352L03hNqQC"
+      },
+      "saleInfo": {
+        "country": "US",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "US",
+        "viewability": "PARTIAL",
+        "embeddable": true,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED_FOR_ACCESSIBILITY",
+        "epub": {
+          "isAvailable": true,
+          "acsTokenLink": "http://books.google.com/books/download/Unbearable_Lightness-sample-epub.acsm?id=i352L03hNqQC&format=epub&output=acs4_fulfillment_token&dl_type=sample&source=gbs_api"
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=i352L03hNqQC&hl=&source=gbs_api",
+        "accessViewStatus": "SAMPLE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "I just wanted to excel in dieting. And weighing in at 80 pounds on 300 calories a day, I was the best little dieter there ever was.&quot; In scalding prose, Portia de Rossi reveals the pain and illness that haunted her for decades."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "shheDwAAQBAJ",
+      "etag": "ImUwAw5fuOg",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/shheDwAAQBAJ",
+      "volumeInfo": {
+        "title": "The Unbearable Lightness of Being by Milan Kundera (Book Analysis)",
+        "subtitle": "Detailed Summary, Analysis and Reading Guide",
+        "authors": [
+          "Bright Summaries"
+        ],
+        "publisher": "BrightSummaries.com",
+        "publishedDate": "2018-05-31",
+        "description": "Unlock the more straightforward side of The Unbearable Lightness of Being with this concise and insightful summary and analysis! This engaging summary presents an analysis of The Unbearable Lightness of Being by Milan Kundera, an intricate, cyclical novel which charts the lives of Tomas, a successful surgeon, his wife Tereza, his lover Sabina, and Sabina’s lover Franz. The narrative skilfully blends the characters’ experiences of love, political activism and happiness with philosophical musings on the “lightness” of existence, creating an engaging novel which encourages readers to reflect on the meaning of their own lives. Milan Kundera was born in Czechoslovakia, where he had a successful career as a university lecturer and author until the country was invaded by Soviet forces in 1968 following the Prague Spring. His books were banned by the Communist regime, and he moved to France in 1975. He has won a number of prestigious literary awards, including the Jerusalem Prize (1985) and the Czech State Literature Prize (2007). Find out everything you need to know about The Unbearable Lightness of Being in a fraction of the time! This in-depth and informative reading guide brings you: •A complete plot summary •Character studies •Key themes and symbols •Questions for further reflection Why choose BrightSummaries.com? Available in print and digital format, our publications are designed to accompany you on your reading journey. The clear and concise style makes for easy understanding, providing the perfect opportunity to improve your literary knowledge in no time. See the very best of literature in a whole new light with BrightSummaries.com!",
+        "industryIdentifiers": [
+          {
+            "type": "ISBN_13",
+            "identifier": "9782808002080"
+          },
+          {
+            "type": "ISBN_10",
+            "identifier": "2808002084"
+          }
+        ],
+        "readingModes": {
+          "text": true,
+          "image": true
+        },
+        "pageCount": 23,
+        "printType": "BOOK",
+        "categories": [
+          "Literary Criticism"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": true,
+        "contentVersion": "0.3.4.0.preview.3",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=shheDwAAQBAJ&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=shheDwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=shheDwAAQBAJ&printsec=frontcover&dq=the+unbearable+lightness+of+being&hl=&cd=6&source=gbs_api",
+        "infoLink": "https://play.google.com/store/books/details?id=shheDwAAQBAJ&source=gbs_api",
+        "canonicalVolumeLink": "https://play.google.com/store/books/details?id=shheDwAAQBAJ"
+      },
+      "saleInfo": {
+        "country": "US",
+        "saleability": "FOR_SALE",
+        "isEbook": true,
+        "listPrice": {
+          "amount": 7.66,
+          "currencyCode": "USD"
+        },
+        "retailPrice": {
+          "amount": 7.66,
+          "currencyCode": "USD"
+        },
+        "buyLink": "https://play.google.com/store/books/details?id=shheDwAAQBAJ&rdid=book-shheDwAAQBAJ&rdot=1&source=gbs_api",
+        "offers": [
+          {
+            "finskyOfferType": 1,
+            "listPrice": {
+              "amountInMicros": 7660000,
+              "currencyCode": "USD"
+            },
+            "retailPrice": {
+              "amountInMicros": 7660000,
+              "currencyCode": "USD"
+            },
+            "giftable": true
+          }
+        ]
+      },
+      "accessInfo": {
+        "country": "US",
+        "viewability": "PARTIAL",
+        "embeddable": true,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": true
+        },
+        "pdf": {
+          "isAvailable": true
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=shheDwAAQBAJ&hl=&source=gbs_api",
+        "accessViewStatus": "SAMPLE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "Unlock the more straightforward side of The Unbearable Lightness of Being with this concise and insightful summary and analysis!"
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "5fEOD1rUMmcC",
+      "etag": "TPN7HKJAr9U",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/5fEOD1rUMmcC",
+      "volumeInfo": {
+        "title": "Immortality",
+        "authors": [
+          "Milan Kundera"
+        ],
+        "publisher": "Harper Collins",
+        "publishedDate": "1999-10-20",
+        "description": "Milan Kundera's sixth novel springs from a casual gesture of a woman to her swimming instructor, a gesture that creates a character in the mind of a writer named Kundera. Like Flaubert's Emma or Tolstoy's Anna, Kundera's Agnes becomes an object of fascination, of indefinable longing. From that character springs a novel, a gesture of the imagination that both embodies and articulates Milan Kundera's supreme mastery of the novel and its purpose; to explore thoroughly the great, themes of existence.",
+        "industryIdentifiers": [
+          {
+            "type": "ISBN_13",
+            "identifier": "9780060932381"
+          },
+          {
+            "type": "ISBN_10",
+            "identifier": "0060932384"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 370,
+        "printType": "BOOK",
+        "categories": [
+          "Fiction"
+        ],
+        "averageRating": 3.5,
+        "ratingsCount": 15,
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "0.1.1.0.preview.0",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=5fEOD1rUMmcC&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=5fEOD1rUMmcC&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=5fEOD1rUMmcC&printsec=frontcover&dq=the+unbearable+lightness+of+being&hl=&cd=7&source=gbs_api",
+        "infoLink": "http://books.google.com/books?id=5fEOD1rUMmcC&dq=the+unbearable+lightness+of+being&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/Immortality.html?hl=&id=5fEOD1rUMmcC"
+      },
+      "saleInfo": {
+        "country": "US",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "US",
+        "viewability": "PARTIAL",
+        "embeddable": true,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=5fEOD1rUMmcC&hl=&source=gbs_api",
+        "accessViewStatus": "SAMPLE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "From that character springs a novel, a gesture of the imagination that both embodies and articulates Milan Kundera&#39;s supreme mastery of the novel and its purpose; to explore thoroughly the great, themes of existence."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "_FCIDwAAQBAJ",
+      "etag": "XYUfiDsHf/Q",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/_FCIDwAAQBAJ",
+      "volumeInfo": {
+        "title": "Pog",
+        "authors": [
+          "Padraig Kenny"
+        ],
+        "publisher": "Chicken House",
+        "publishedDate": "2019-04-04",
+        "description": "'One of a kind. Utterly fantastic.' Eoin Colfer on Tin David and Penny's strange new home is surrounded by forest. It's the childhood home of their mother, who's recently died. But other creatures live here ... magical creatures, like tiny, hairy Pog. He's one of the First Folk, protecting the boundary between the worlds. As the children explore, they discover monsters slipping through from the place on the other side of the cellar door. Meanwhile, David is drawn into the woods by something darker, which insists there's a way he can bring his mother back ...",
+        "industryIdentifiers": [
+          {
+            "type": "ISBN_13",
+            "identifier": "9781912626014"
+          },
+          {
+            "type": "ISBN_10",
+            "identifier": "1912626012"
+          }
+        ],
+        "readingModes": {
+          "text": true,
+          "image": true
+        },
+        "pageCount": 320,
+        "printType": "BOOK",
+        "categories": [
+          "Juvenile Fiction"
+        ],
+        "averageRating": 5,
+        "ratingsCount": 1,
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": true,
+        "contentVersion": "1.2.2.0.preview.3",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=_FCIDwAAQBAJ&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=_FCIDwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=_FCIDwAAQBAJ&printsec=frontcover&dq=the+unbearable+lightness+of+being&hl=&cd=8&source=gbs_api",
+        "infoLink": "http://books.google.com/books?id=_FCIDwAAQBAJ&dq=the+unbearable+lightness+of+being&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/Pog.html?hl=&id=_FCIDwAAQBAJ"
+      },
+      "saleInfo": {
+        "country": "US",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "US",
+        "viewability": "PARTIAL",
+        "embeddable": true,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": true,
+          "acsTokenLink": "http://books.google.com/books/download/Pog-sample-epub.acsm?id=_FCIDwAAQBAJ&format=epub&output=acs4_fulfillment_token&dl_type=sample&source=gbs_api"
+        },
+        "pdf": {
+          "isAvailable": true,
+          "acsTokenLink": "http://books.google.com/books/download/Pog-sample-pdf.acsm?id=_FCIDwAAQBAJ&format=pdf&output=acs4_fulfillment_token&dl_type=sample&source=gbs_api"
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=_FCIDwAAQBAJ&hl=&source=gbs_api",
+        "accessViewStatus": "SAMPLE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "Utterly fantastic.&#39; Eoin Colfer on Tin David and Penny&#39;s strange new home is surrounded by forest. It&#39;s the childhood home of their mother, who&#39;s recently died. But other creatures live here ... magical creatures, like tiny, hairy Pog."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "kWpRDwAAQBAJ",
+      "etag": "tm9IHRWCW/4",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/kWpRDwAAQBAJ",
+      "volumeInfo": {
+        "title": "Reading the Modern European Novel since 1900",
+        "subtitle": "A Critical Study of Major Fiction from Proust's Swann's Way to Ferrante's Neapolitan Tetralogy",
+        "authors": [
+          "Daniel R. Schwarz"
+        ],
+        "publisher": "John Wiley & Sons",
+        "publishedDate": "2018-03-14",
+        "description": "An exploration of the modern European novel from a renowned English literature scholar Reading the Modern European Novel since 1900 is an engaging, in-depth examination of the evolution of the modern European novel. Written in Daniel R. Schwarz's precise and highly readable style, this critical study offers compelling discussions on a wide range of major works since 1900 and examines recurring themes within the context of significant historical events, including both World Wars and the Holocaust. The author cites important developments in the evolution of the modern novel and explores how these paradigmatic works of fiction reflect intellectual and cultural history, including developments in painting and cinema. Schwarz focuses on narrative complexity, thematic subtlety, and formal originality as well as how novels render historical events and cultural developments Discussing major works by Proust, Camus, Mann, Kafka, Grass, di Lampedusa, Bassani, Kertesz, Pamuk, Kundera, Saramago, Muller and Ferrante, Schwarz explores how these often experimental masterworks pay homage to the their major predecessors—discussed in Schwarz's ground-breaking Reading the European Novel to 1900—even while proposing radical departures from realism in their approach to time and space, their testing the limits of language, and their innovative ways of rendering the human psyche. Written for teachers and students by a highly-acclaimed scholar and including valuable study questions, Reading the Modern European Novel since 1900 offers a guide for a deeper understanding of how these original modern masters respond to both the past and present.",
+        "industryIdentifiers": [
+          {
+            "type": "ISBN_13",
+            "identifier": "9781118693414"
+          },
+          {
+            "type": "ISBN_10",
+            "identifier": "1118693418"
+          }
+        ],
+        "readingModes": {
+          "text": true,
+          "image": true
+        },
+        "pageCount": 402,
+        "printType": "BOOK",
+        "categories": [
+          "Literary Criticism"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "0.0.1.0.preview.3",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=kWpRDwAAQBAJ&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=kWpRDwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=kWpRDwAAQBAJ&printsec=frontcover&dq=the+unbearable+lightness+of+being&hl=&cd=9&source=gbs_api",
+        "infoLink": "https://play.google.com/store/books/details?id=kWpRDwAAQBAJ&source=gbs_api",
+        "canonicalVolumeLink": "https://play.google.com/store/books/details?id=kWpRDwAAQBAJ"
+      },
+      "saleInfo": {
+        "country": "US",
+        "saleability": "FOR_SALE",
+        "isEbook": true,
+        "listPrice": {
+          "amount": 30,
+          "currencyCode": "USD"
+        },
+        "retailPrice": {
+          "amount": 30,
+          "currencyCode": "USD"
+        },
+        "buyLink": "https://play.google.com/store/books/details?id=kWpRDwAAQBAJ&rdid=book-kWpRDwAAQBAJ&rdot=1&source=gbs_api",
+        "offers": [
+          {
+            "finskyOfferType": 1,
+            "listPrice": {
+              "amountInMicros": 30000000,
+              "currencyCode": "USD"
+            },
+            "retailPrice": {
+              "amountInMicros": 30000000,
+              "currencyCode": "USD"
+            },
+            "giftable": true
+          }
+        ]
+      },
+      "accessInfo": {
+        "country": "US",
+        "viewability": "PARTIAL",
+        "embeddable": true,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": true,
+          "acsTokenLink": "http://books.google.com/books/download/Reading_the_Modern_European_Novel_since-sample-epub.acsm?id=kWpRDwAAQBAJ&format=epub&output=acs4_fulfillment_token&dl_type=sample&source=gbs_api"
+        },
+        "pdf": {
+          "isAvailable": true,
+          "acsTokenLink": "http://books.google.com/books/download/Reading_the_Modern_European_Novel_since-sample-pdf.acsm?id=kWpRDwAAQBAJ&format=pdf&output=acs4_fulfillment_token&dl_type=sample&source=gbs_api"
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=kWpRDwAAQBAJ&hl=&source=gbs_api",
+        "accessViewStatus": "SAMPLE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "An exploration of the modern European novel from a renowned English literature scholar Reading the Modern European Novel since 1900 is an engaging, in-depth examination of the evolution of the modern European novel."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "tg3rswEACAAJ",
+      "etag": "eu72h83vvsw",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/tg3rswEACAAJ",
+      "volumeInfo": {
+        "title": "The Unbearable Lightness of Being",
+        "authors": [
+          "Milan Kundera"
+        ],
+        "publisher": "HarperCollins Publishers",
+        "publishedDate": "1985",
+        "description": "A young woman in love with a man torn between his love for her and his incorrigible womanizing; one of his mistresses and her humbly faithful lover--these are the two couples whose story are told in this masterful classic.",
+        "industryIdentifiers": [
+          {
+            "type": "ISBN_10",
+            "identifier": "0060912529"
+          },
+          {
+            "type": "ISBN_13",
+            "identifier": "9780060912529"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 314,
+        "printType": "BOOK",
+        "categories": [
+          "Continental European fiction (Fictional works by one author)."
+        ],
+        "averageRating": 3.5,
+        "ratingsCount": 102,
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "preview-1.0.0",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=tg3rswEACAAJ&dq=the+unbearable+lightness+of+being&hl=&cd=10&source=gbs_api",
+        "infoLink": "http://books.google.com/books?id=tg3rswEACAAJ&dq=the+unbearable+lightness+of+being&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/The_Unbearable_Lightness_of_Being.html?hl=&id=tg3rswEACAAJ"
+      },
+      "saleInfo": {
+        "country": "US",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "US",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=tg3rswEACAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "A young woman in love with a man torn between his love for her and his incorrigible womanizing; one of his mistresses and her humbly faithful lover--these are the two couples whose story are told in this masterful classic."
+      }
+    }
+  ]
+}

@@ -46,7 +46,8 @@ def get_followers(user_id):
 
         user = session.query(User).filter_by(user_id=user_id).first()
 
-        # get the list of followers
+        # TODO change
+        print(f"{user.name} followers: {[follower.name for follower in user.followers]}, following: {[followee.name for followee in user.following]}")            
 
         session.close()
         engine.dispose()
@@ -80,29 +81,40 @@ def create_user(user_data):
         Session = sessionmaker(bind=engine)
         session = Session()
 
-        #user name and email is required to create a new user, phone optional?
-        if(name.empty):
-            print ("Need to enter a user name to create a new user")
+        # username, full name, email, profile picture
+        username = user_data['username']
+        full_name = user_data['full_name']
+        email = user_data['email']
+        # profile_picture = user_data['profile_picture'] NOT SURE HOW TO DO THIS
+
+        if not username:
+            print ("Need to enter a username to create a new user") # something like that
+            session.close()
+            engine.dispose()
+            return None
+        
+        if not full_name:
+            print("Need to enter full name to create a new user")
             session.close()
             engine.dispose()
             return None
 
-        if(email.empty):
+        if not email:
             print ("Need to enter a user email to create a new user")
             session.close()
             engine.dispose()
             return None
 
-        new_user = User(user_name=name, user_email=email, user_phone=phone)
+        new_user = User(username=username, full_name=full_name, email=email)
         session.add(new_user)
         session.commit()
         created_user_id = new_user.user_id
 
-        # print(f"User created with ID: {new_user.user_id}")
+        print(f"User created with ID: {new_user.user_id}")
         session.close()
         engine.dispose()
 
-        return {"user_id": created_user_id, "user_name": name}
+        return {"user_id": created_user_id, "user_name": username} # not sure this is the best return type
 
     except Exception as ex:
         print(ex, file=stderr)
@@ -117,7 +129,30 @@ def follow_user(user1, user2):
     """
     make user 1 follow user 2
     """
-    pass
+    follower_id = user1
+    user_id_to_follow = user2
+    # TODO: add input validation
+
+    try:
+        Session = sessionmaker(bind=engine)
+        session = Session()
+
+        follower = session.query(User).filter_by(user_id=follower_id).first()
+        user_to_follow = session.query(User).filter_by(user_id=user_id_to_follow).first()
+
+        user_to_follow.followers.append(follower)
+        follower.following.append(user_to_follow)
+
+        session.commit()
+
+        print(f"{follower.name} ({follower_id}) successfully followed {user_to_follow.name} ({user_id_to_follow})")
+
+        session.close()
+        engine.dispose()
+
+    except Exception as ex:
+        print(ex, file=stderr)
+        exit(1)
 
 def unfollow_user(user1, user2):
     """

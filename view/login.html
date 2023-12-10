@@ -3,11 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <title>Login</title>
-    <!-- <link rel="stylesheet" href="../static/stylesheet.css" /> -->
+    <link rel="stylesheet" href="../static/stylesheet.css" />
   </head>
   <body>
-    <!-- <div class="page"> -->
-      <!-- <div class="login-wrapper"> -->
+    <div class="page">
+      <div class="login-wrapper">
         <h2>Login</h2>
         <form action="{{ url_for('login') }}" method="post">
           <label for="email">Email:</label>
@@ -21,7 +21,7 @@
           Don't have an account?
           <a href="{{ url_for('signup') }}">Register here</a>.
         </p>
-      <!-- </div> -->
-    <!-- </div> -->
+      </div>
+    </div>
   </body>
 </html>

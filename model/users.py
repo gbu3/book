@@ -84,6 +84,33 @@ def get_user(user_id):
     finally:
         session.close()
 
+def is_a_follower(user2, user1):
+    """
+    checks whether user2 is a follower of user1
+    given their user ids
+    returns True or False
+    """
+    try:
+        Session = sessionmaker(bind=engine)
+        session = Session()
+
+        user1 = session.query(User).filter_by(user_id=user1).first()
+
+        if not user1:
+            return False
+
+        for follower in user1.followers:
+            if follower.user_id == user2:
+                return True
+        
+        return False
+
+    except Exception as ex:
+        print(ex, file=stderr)
+        exit(1)
+    finally:
+        session.close()
+
 def get_followers(user_id):
     """
     returns a list of user dicts for all followers of
@@ -112,16 +139,9 @@ def get_followers(user_id):
     finally:
         session.close()
 
-def is_a_follower(user2, user1):
-    """
-    checks whether user2 followers user1
-    returns True or False
-    """
-    pass
-
 def get_following(user_id):
     """
-    returns a list of user_ids that the given user is following
+    returns a list of user dicts that the given user is following
     """
     try:
         Session = sessionmaker(bind=engine)
@@ -147,6 +167,11 @@ def get_following(user_id):
         session.close()
 
 def create_user(username, full_name, email, password):
+    """
+    creates a user with the required inputs of:
+    username, full name, and email
+    password is from flask_login
+    """
     try:
         Session = sessionmaker(bind=engine)
         session = Session()
@@ -259,7 +284,6 @@ def follow_user(user1, user2):
     """
     follower_id = user1
     user_id_to_follow = user2
-    # TODO: add input validation
 
     try:
         Session = sessionmaker(bind=engine)
@@ -273,10 +297,7 @@ def follow_user(user1, user2):
 
         session.commit()
 
-        print(f"{follower.name} ({follower_id}) successfully followed {user_to_follow.name} ({user_id_to_follow})")
-
-        session.close()
-        engine.dispose()
+        print(f"{follower.username} ({follower_id}) successfully followed {user_to_follow.username} ({user_id_to_follow})")
 
     except Exception as ex:
         print(ex, file=stderr)
@@ -288,6 +309,55 @@ def unfollow_user(user1, user2):
     """
     make user 1 unfollow user 2
     """
+    follower_id = user1
+    user_id_to_unfollow = user2
+
+    try:
+        Session = sessionmaker(bind=engine)
+        session = Session()
+
+        follower = session.query(User).filter_by(user_id=follower_id).first()
+        user_to_unfollow = session.query(User).filter_by(user_id=user_id_to_unfollow).first()
+
+        if not follower or not user_to_unfollow:
+            print("One of the users does not exist.")
+            return
+
+        if follower in user_to_unfollow.followers:
+            user_to_unfollow.followers.remove(follower)
+
+        if user_to_unfollow in follower.following:
+            follower.following.remove(user_to_unfollow)
+
+        session.commit()
+
+        print(f"{follower.username} ({follower_id}) successfully unfollowed {user_to_unfollow.username} ({user_id_to_unfollow})")
+
+    except Exception as ex:
+        print(ex, file=stderr)
+        exit(1)
+    finally:
+        session.close()
 
 def delete_user(user_id):
-    pass
+    try:
+        Session = sessionmaker(bind=engine)
+        session = Session()
+
+        user = session.query(User).filter(User.user_id == user_id).first()
+        if user:
+            session.delete(user)
+            session.commit()
+            print(f"User {user_id} deleted successfully.")
+            ret = user_id
+        else:
+            print(f"No user found with ID {user_id}")
+            ret = None
+
+        return ret
+
+    except Exception as ex:
+        print(ex, file=stderr)
+        exit(1)
+    finally:
+        session.close()

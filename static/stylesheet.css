@@ -1,0 +1,67 @@
+.topnav {
+    background-color: #a7b3b7;
+    overflow: hidden;
+    font-family: "Mulish", sans-serif;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    margin: 0 auto;
+    padding: 0;
+    width: 100%;
+    height: 50px;
+    top: 0;
+    left: 0;
+}
+
+.logo img {
+    width: 100px;
+    height: auto;
+    padding: 14px 16px;
+}
+
+.nav-items {
+    display: flex;
+    align-items: center;
+}
+
+.nav-items a {
+    color: #f2f2f2;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-size: 17px;
+}
+
+.topnav a:hover {
+    background-color: #393f48;
+    color: white;
+}
+
+.footer {
+    padding: 14px 16px;
+}
+
+
+
+.page {
+    width: 100%;
+    height: 100%;
+    display: flex;
+  }
+  
+  .login-wrapper {
+    padding: 20px;
+    /* Adjust as needed */
+    /* Other styles like max-width can be applied for better control */
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+    align-items: center;
+  }
+  
+  .content-wrapper {
+    padding: 20px;
+    /* Adjust as needed */
+    /* Other styles like max-width can be applied for better control */
+  }

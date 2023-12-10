@@ -1,24 +1,143 @@
-from flask import Flask, request, jsonify, abort
+from flask import Flask, request, make_response, redirect, url_for, jsonify, abort, render_template, flash
+from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user, AnonymousUserMixin
 from flask_sqlalchemy import SQLAlchemy
 
-from models.database import DB_URL
-import models.books as books
-import models.users as users
-import models.lists as lists
-import models.reviews as reviews
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, scoped_session
+
+from model.database import DB_URL, User
+import model.books as books
+import model.users as users
+import model.lists as lists
+import model.reviews as reviews
+import os
+from sys import argv, stderr, exit
+import re
 
 """
 central place where URL routes are defined
 """
 
-app = Flask(__name__)
-# app.config['SQLALCHEMY_DATABASE_URI'] = DB_URL
-# db = SQLAlchemy(app)
-# # can probably remove the SQLAlchemy stuff, use it in the service part
+app = Flask(__name__, template_folder='view')
+app.secret_key = os.urandom(24)
+
+#-----------------------------------------------------------------------
+# Flask-Login setup
+login_manager = LoginManager()
+login_manager.init_app(app)
+engine = create_engine(DB_URL)
+Session = scoped_session(sessionmaker(bind=engine))
+
+@login_manager.user_loader
+def load_user(user_id):
+    session = Session()
+    try:
+        user = session.query(User).get(int(user_id))
+        if not user:
+            return None
+        else:
+            return user
+    except Exception as ex:
+        print(ex, file=stderr)
+        exit(1)
+    finally:
+        session.close()
+
+# LOGIN ENDPOINTS
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'GET':
+        return render_template('login.html')
+
+    email = request.form['email']
+    user_obj = users.get_user_by_email(email)
+
+    if user_obj and user_obj.check_password(request.form['password']):
+        login_user(user_obj)
+        return redirect(url_for('index'))
+    else: # on error
+        flash('Invalid email or password')
+        return render_template('login.html')
+
+@login_manager.unauthorized_handler
+def unauthorized_handler():
+    return redirect(url_for('login'))
+
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
+
+@app.route('/register', methods=['GET', 'POST'])
+def signup():
+    if request.method == 'POST':
+        username = request.form['username']
+        full_name = request.form['full_name']
+        email = request.form['email']
+        phone = request.form['phone']
+        password = request.form['password']
+        confirm_password = request.form['confirm_password']
+
+        ## INPUT CHEKCING ##
+        if users.get_user_by_username(username):
+            flash("Username already taken.")
+            return render_template('register.html')
+
+        if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+            flash("Invalid email address.")
+            return render_template('register.html')
+
+        if not re.match(r"\d", phone):
+            flash("Invalid phone number.")
+            return render_template('register.html')
+
+        # password checking
+        if password != confirm_password:
+            flash("Passwords do not match.")
+            return render_template('register.html')
+
+        if users.create_user(username, full_name, email, phone, password):
+            return redirect(url_for('login'))
+        else:
+            flash("Error creating user.")
+            return render_template('register.html')
+
+    return render_template('register.html')
 
 #-----------------------------------------------------------------------
 
-# /books endpoints
+@app.route('/', methods=['GET'])
+@app.route('/index', methods=['GET'])
+@login_required
+def index():
+    # put whatever needed into the HTML
+    html = render_template("index.html")
+
+    response = make_response(html)
+    return response
+
+@app.route('/users/profile', methods=['GET'])
+@login_required
+def get_profile_info():
+    """
+    get current user information for profile page
+    """
+    user_dict = users.get_user_info(current_user.user_id)
+    if user_dict:
+        html = render_template('profile.html',
+            user_id=user_dict['user_id'],
+            username=user_dict['username'],
+            full_name = user_dict['full_name'],
+            email=user_dict['user_email'],
+            phone=user_dict['user_phone'])
+    else:
+        html = render_template('profile.html', name=None)
+    response = make_response(html)
+    return response
+
+#-----------------------------------------------------------------------
+
+# BOOKS endpoints
 
 @app.route('/books/search', methods=['GET'])
 def search_books():
@@ -395,7 +514,7 @@ def get_followers(user_id):
 
     return jsonify(users.get_followers(user_id))
 
-@app.route('/users/<int:user_id>/followers/<int:user_id>', methods=['GET'])
+@app.route('/users/<int:user1_id>/followers/<int:user2_id>', methods=['GET'])
 def is_a_follower(user1, user2):
     """
     checks whether user2 follows user1
@@ -420,7 +539,7 @@ def get_following(user_id):
 
     return jsonify(users.get_following(user_id))
 
-@app.route('/users/<int:user_id>/following/<int:user_id>', methods=['GET'])
+@app.route('/users/<int:user1_id>/following/<int:user2_id>', methods=['GET'])
 def is_following(user1, user2):
     """
     checks whether user1 follows user2
@@ -458,7 +577,7 @@ def create_update_user():
 
     return jsonify(users.create_user(user_data)) # should just return the user data back if successful, or the new user_id?
 
-@app.route('/users/<int:user_id>/follow/<int:user_id>', methods=['POST', 'PUT'])
+@app.route('/users/<int:user1_id>/follow/<int:user2_id>', methods=['POST', 'PUT'])
 def follow_user(user1, user2):
     """
     user 1 follows user 2
@@ -471,7 +590,7 @@ def follow_user(user1, user2):
     
     return jsonify(users.follow_user(user1, user2))
 
-@app.route('/users/<int:user_id>/unfollow/<int:user_id>', methods=['POST', 'PUT'])
+@app.route('/users/<int:user1_id>/unfollow/<int:user2_id>', methods=['POST', 'PUT'])
 def unfollow_user(user1, user2):
     """
     user 1 unfollows user 2

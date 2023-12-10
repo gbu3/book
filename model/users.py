@@ -1,7 +1,7 @@
 from sys import argv, stderr, exit
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from models.database import Base, User, UserFollower, Review, Book, List, ListBook, Like, DB_URL
+from model.database import Base, User, Review, Book, List, DB_URL
 
 engine = create_engine(DB_URL)
 
@@ -16,7 +16,8 @@ def _user_to_dict(user):
         "user_id": user.user_id,
         "username": user.username,
         "full_name": user.full_name,
-        "email": user.email
+        "email": user.email,
+        "phone": user.phone
         # "metadata_info": user.metadata_info,
         # "lists": [list_to_dict(lst) for lst in user.lists],
         # "reviews": [review_to_dict(review) for review in user.reviews],
@@ -61,9 +62,9 @@ def search_users(user_id, username, full_name, email, limit):
     finally:
         session.close()
 
-def get_user(user_id):
+def get_user_info(user_id):
     """
-    get user by user id
+    get user information in a dict by user id
     """
     try:
         Session = sessionmaker(bind=engine)
@@ -81,6 +82,28 @@ def get_user(user_id):
     except Exception as ex:
         print(ex, file=stderr)
         exit(1)
+    finally:
+        session.close()
+
+def get_user_by_email(email):
+    Session = sessionmaker(bind=engine)
+    session = Session()
+    try:
+        user = session.query(User).filter_by(email=email).first()
+        return user
+    except Exception as ex:
+        print(ex, file=stderr)
+    finally:
+        session.close()
+
+def get_user_by_username(username):
+    Session = sessionmaker(bind=engine)
+    session = Session()
+    try:
+        user = session.query(User).filter_by(username=username).first()
+        return user
+    except Exception as ex:
+        print(ex, file=stderr)
     finally:
         session.close()
 
@@ -166,7 +189,7 @@ def get_following(user_id):
     finally:
         session.close()
 
-def create_user(username, full_name, email, password):
+def create_user(username, full_name, email, phone, password):
     """
     creates a user with the required inputs of:
     username, full name, and email
@@ -183,15 +206,21 @@ def create_user(username, full_name, email, password):
             return None
         
         if not full_name:
-            print("Need to enter full name to create a new user")
+            print("Need to enter a full name to create a new user")
             return None
 
         if not email:
-            print ("Need to enter a user email to create a new user")
+            print ("Need to enter an email to create a new user")
+            return None
+        
+        if not phone:
+            print ("Need to enter a phone number to create a new user")
             return None
 
-        new_user = User(username=username, full_name=full_name, email=email)
+        new_user = User(username=username, full_name=full_name, email=email, phone=phone)
+        print("here, new_user")
         new_user.set_password(password)
+        print("issue")
         session.add(new_user)
         session.commit()
         created_user_id = new_user.user_id

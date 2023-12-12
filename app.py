@@ -475,32 +475,53 @@ def delete_list(list_id):
 # users endpoints
 
 @app.route('/users/search', methods=['GET'])
+@login_required
 def search_users():
     """
     return all users who match a keyword/phrase
     LIMIT 100 unless otherwise specified
     """
-    search_terms = request.args.get('search')
-    if not search_terms:
-        return jsonify(None)
+    user_id = request.args.get('user_id')
+    username = request.args.get('username')
+    full_name = request.args.get('full_name')
+    email = request.args.get('email')
+    limit = request.args.get('limit')
+
+    if not user_id and not username and not full_name and not email:
+        flash("Error: need to have at least one search term")
+        return None
     
-    limit = request.args.get("limit")
     if not limit:
         limit = 100
 
-    return jsonify(users.search_users(search_terms, limit))
+    return jsonify(users.search_users(user_id, username, full_name, email, limit))
 
 @app.route('/users/<int:user_id>', methods=['GET'])
+@login_required
 def get_user(user_id):
     """
     get user by id
     """
+    user_id = request.args.get('user_id')
+    if not user_id:
+        abort(400, "user not provided")
     try:
         user_id = int(user_id)
     except ValueError:
         abort(400, "user_id is not an integer")
 
-    return jsonify(users.get_user(user_id))
+    user_dict = users.get_user_info(current_user.user_id)
+    if user_dict:
+        html = render_template('profile.html',
+            user_id=user_dict['user_id'],
+            username=user_dict['username'],
+            full_name = user_dict['full_name'],
+            email=user_dict['user_email'],
+            phone=user_dict['user_phone'])
+    else:
+        html = render_template('profile.html', name=None)
+    response = make_response(html)
+    return response
 
 @app.route('/users/<int:user_id>/followers', methods=['GET'])
 def get_followers(user_id):
@@ -552,30 +573,104 @@ def is_following(user1, user2):
 
     return jsonify(users.is_a_follower(user1, user2))
 
-@app.route('/users', methods=['POST'])
-def create_update_user():
+@app.route('/users/update_full_name', methods=['POST'])
+@login_required
+def update_full_name():
     """
-    creates or updates a new user
-    depending on whether user_id is given
+    update user's full name. once username is chosen,
+    it cannot be updated.
     """
-    user_data = request.body.get('user_data')
-    # request structure:
-        # username, profile_image
-        # metadata: full_name, location, email, etc.
-    if not user_data:
-        abort(400, "user data not provided")
-    # should also check that certain required parts of user data are provided
-        
-    user_id = request.body.get('user_id')
-    if user_id:
-        try:
-            user_id = int(user_id)
-        except ValueError:
-            abort(400, "user_id is not an integer")
-    
-        return jsonify(users.update_user(user_id, user_data))
+    current_user_id = current_user.get_id()
+    user_id = request.form.get('user_id')
+    if not user_id:
+        abort(400, "user not provided")
+    if current_user_id != user_id:
+        abort(403, "Unauthorized access")
+    try:
+        user_id = int(user_id)
+    except ValueError:
+        abort(400, "user_id is not an integer")
 
-    return jsonify(users.create_user(user_data)) # should just return the user data back if successful, or the new user_id?
+    new_name = request.form.get('name')
+    if new_name:
+        users.update_full_name(user_id, new_name)
+
+    return redirect(url_for ('get_profile_info'))
+
+@app.route('/users/update_email', methods=['POST'])
+@login_required
+def update_user_email():
+    """
+    update user's email
+    """
+    current_user_id = current_user.get_id()
+    user_id = request.form.get('user_id')
+    if not user_id:
+        abort(400, "user not provided")
+    if current_user_id != user_id:
+        abort(403, "Unauthorized access")
+    try:
+        user_id = int(user_id)
+    except ValueError:
+        abort(400, "user_id is not an integer")
+
+    new_email = request.form.get('email')
+    if not re.match(r"[^@]+@[^@]+\.[^@]+", new_email):
+            flash("Invalid email address.")
+            return redirect(url_for('get_profile_info'))
+    if new_email:
+        users.update_user_email(user_id, new_email)
+    return redirect(url_for('get_profile_info'))
+
+@app.route('/users/update_phone', methods=['POST'])
+@login_required
+def update_user_phone():
+    """
+    update user's phone number
+    """
+    current_user_id = current_user.get_id()
+    user_id = request.form.get('user_id')
+    if not user_id:
+        abort(400, "user not provided")
+    if current_user_id != user_id:
+        abort(403, "Unauthorized access")
+    try:
+        user_id = int(user_id)
+    except ValueError:
+        abort(400, "user_id is not an integer")
+
+    new_phone = request.form.get('phone')
+    if not re.match(r"\d", new_phone):
+        flash("Invalid phone number.")
+        return redirect(url_for('get_profile_info'))
+    if new_phone:
+        users.update_user_phone(user_id, new_phone)
+    return redirect(url_for('get_profile_info'))
+
+# @app.route('/users', methods=['POST'])
+# def create_update_user():
+#     """
+#     creates or updates a new user
+#     depending on whether user_id is given
+#     """
+#     user_data = request.body.get('user_data')
+#     # request structure:
+#         # username, profile_image
+#         # metadata: full_name, location, email, etc.
+#     if not user_data:
+#         abort(400, "user data not provided")
+#     # should also check that certain required parts of user data are provided
+        
+#     user_id = request.body.get('user_id')
+#     if user_id:
+#         try:
+#             user_id = int(user_id)
+#         except ValueError:
+#             abort(400, "user_id is not an integer")
+    
+#         return jsonify(users.update_user(user_id, user_data))
+
+#     return jsonify(users.create_user(user_data)) # should just return the user data back if successful, or the new user_id?
 
 @app.route('/users/<int:user1_id>/follow/<int:user2_id>', methods=['POST', 'PUT'])
 def follow_user(user1, user2):

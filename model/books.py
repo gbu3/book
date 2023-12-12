@@ -1,6 +1,6 @@
 from sys import argv, stderr, exit
 from sqlalchemy import create_engine, or_, and_, func
-from sqlalchemy.orm import sessionmaker, joinedload
+from sqlalchemy.orm import sessionmaker, joinedload, aliased
 from model.database import DB_URL, Base, User, Review, List, Editions, editions_authors, editions_works, Authors, editions_genres, editions_subjects, Places, editions_publish_places, authors_locations, Author_Photos, Publishers, editions_publishers, Editions_Covers, Subjects, Genres, Works, DB_URL
 
 """
@@ -66,155 +66,19 @@ engine = create_engine(DB_URL)
 
 REVIEW_LIMIT = 10
 
-def _edition_to_dict(edition):
-    return {
-        'edition_id': edition.id,
-        'title': edition.title,
-        'author': [(author.name, author.id) for author in edition.authors],
-        'publication_place': [place.place for place in edition.publish_places],
-        'publisher': [publisher.publisher for publisher in edition.publishers],
-        'publish_date': edition.publish_date,
-        'edition_cover': edition.editions_covers[0].cover if edition.editions_covers else None
-    }
-    try:
-        Session = sessionmaker(bind=engine)
-        session = Session()
-
-        authors_names = session.query(Authors.name)\
-                        .join(editions_authors, Authors.id == editions_authors.c.author_id)\
-                        .filter(editions_authors.c.edition_id == edition.id)\
-                        .distinct()\
-                        .all()
-        
-        print(authors_names)
-
-        places = session.query(Places.place)\
-                        .join(editions_publish_places, Places.id == editions_publish_places.c.place_id)\
-                        .filter(editions_publish_places.c.edition_id == edition.id)\
-                        .distinct()\
-                        .all()
-        
-        print(places)
-
-        publishers = session.query(Publishers.publisher)\
-                            .join(editions_publishers, Publishers.id == editions_publishers.c.publisher_id)\
-                            .filter(editions_publishers.c.edition_id == edition.id)\
-                            .all()
-        
-        print(publishers)
-
-        cover = session.query(Editions_Covers.cover)\
-                        .filter(Editions_Covers.edition_id == edition.id)\
-                        .first()
-        
-        return {
-            'edition_id': edition.id,
-            'title': edition.title,
-            'author': authors_names,
-            'publication_place': places,
-            'publisher': [publisher.publisher for publisher in edition.publishers],
-            'publish_date': edition.publish_date,
-            'edition_cover': cover
-        }
-
-    except Exception as ex:
-        print(ex, file=stderr)
-        exit(1)
-    finally:
-        session.close()
-
-def _edition_details_dict(edition):
-    # return {
-    #     'edition_id': edition.id,
-    #     'title': edition.title,
-    #     'author': [author.name for author in edition.authors],
-    #     'publication_place': [place.place for place in edition.publish_places],
-    #     'publisher': [publisher.publisher for publisher in edition.publishers],
-    #     'publish_date': edition.publish_date,
-    #     'edition_cover': edition.editions_covers[0].cover if edition.editions_covers else None
-    # }
-    try:
-        Session = sessionmaker(bind=engine)
-        session = Session()
-
-        authors_names_ids = session.query(Authors.name, Authors.id)\
-                                    .join(editions_authors, Authors.id == editions_authors.c.author_id)\
-                                    .filter(editions_authors.c.edition_id == edition.id)\
-                                    .distinct()\
-                                    .all()
-
-        places = session.query(Places.place)\
-                        .join(editions_publish_places, Places.id == editions_publish_places.c.place_id)\
-                        .filter(editions_publish_places.c.edition_id == edition.id)\
-                        .distinct()\
-                        .all()
-
-        publishers = session.query(Publishers.publisher)\
-                            .join(editions_publishers, Publishers.id == editions_publishers.c.publisher_id)\
-                            .filter(editions_publishers.c.edition_id == edition.id)\
-                            .all()
-        
-        genres = session.query(Genres.genre)\
-                        .join(editions_genres, Genres.id == editions_genres.c.genre_id)\
-                        .filter(editions_genres.c.edition_id == edition.id)\
-                        .all()
-        
-        subjects = session.query(Subjects.subject)\
-                            .join(editions_subjects, Subjects.id == editions_subjects.c.subject_id)\
-                            .filter(editions_subjects.c.edition_id == edition.id)\
-                            .all()
-
-        cover = session.query(Editions_Covers.cover)\
-                        .filter(Editions_Covers.edition_id == edition.id)\
-                        .first()
-        
-        reviews = session.query(Review.summary, Review.note)\
-                         .filter(Review.book_id == edition.id)\
-                         .limit(REVIEW_LIMIT)\
-                         .all()
-
-        average_rating = session.query(func.avg(Review.rating))\
-                                .filter(Review.book_id == edition.id)\
-                                .scalar()
-        
-        return {
-            'edition_id': edition.id,
-            'title': edition.title,
-            'author': authors_names_ids,
-            'publication_place': [item[0] for item in places],
-            'publisher': [item[0] for item in publishers],
-            'publish_date': edition.publish_date,
-            'edition_name': edition.edition_name,
-            'volume_number': edition.volume_number,
-            'description': edition.description,
-            'genres': genres,
-            'subjects': subjects,
-            'edition_cover': cover[0] if cover else None,
-            'reviews': reviews,
-            'average_rating': average_rating
-        }
-
-    except Exception as ex:
-        print(ex, file=stderr)
-        exit(1)
-    finally:
-        session.close()
-
 def search_books(edition_id=None, work_id=None, author_name=None, 
                  author_id=None, title=None, keyword=None, language=None, 
                  start_year=None, end_year=None, limit=100): 
     """
     search by:
-    - work id or edition id
-    - author: name or author id
     - title
-    - keyword (includes title, author name, subject, genre)
-    FILTERS (advanced search)
+    - author: name or author id
+    - work id or edition id
+    OR a combination of these.
+    FILTERS (advanced search) - STRETCH, not curr implemented
     - language
     - year (range)
-    limit # results by limit. default 1000
-
-    this is too slow because it's doing too many table joins
+    limit # results by limit. default 100
     """
     if all(arg is None for arg in [edition_id, work_id, author_name, author_id, 
                                    title, keyword, language, start_year, end_year]):
@@ -224,11 +88,8 @@ def search_books(edition_id=None, work_id=None, author_name=None,
         Session = sessionmaker(bind=engine)
         session = Session()
 
-        query = session.query(Editions).options(joinedload(Editions.authors), 
-                                                joinedload(Editions.publish_places), 
-                                                joinedload(Editions.publishers), 
-                                                joinedload(Editions.editions_covers))
-        
+        query = session.query(Editions)
+
         if edition_id:
             query = query.filter(Editions.id == edition_id)
 
@@ -236,101 +97,33 @@ def search_books(edition_id=None, work_id=None, author_name=None,
             query = query.filter(Editions.works.any(id=work_id))
 
         if author_name or author_id:
-            query = query.join(Editions.authors)
+            # handle multiple filters
+            AuthorAlias = aliased(Authors)
+            query = query.join(AuthorAlias, Editions.authors)
+
             if author_name:
-                query = query.filter(Authors.name.ilike(f'%{author_name}%'))
+                query = query.filter(AuthorAlias.name.ilike(f'%{author_name}%'))
+
             if author_id:
-                query = query.filter(Authors.id == author_id)
+                query = query.filter(AuthorAlias.id == author_id)
 
         if title:
             query = query.filter(Editions.title.ilike(f'%{title}%'))
 
-        if keyword:
-            query = query.join(Editions.publish_places).join(Editions.publishers)
-            query = query.filter(or_(
-                Editions.title.ilike(f'%{keyword}%'),
-                Authors.name.ilike(f'%{keyword}%'),
-                Editions.subjects.any(Subjects.subject.ilike(f'%{keyword}%')),
-                Editions.genres.any(Genres.genre.ilike(f'%{keyword}%'))
-            ))
-
-        query = query.limit(limit)
-        print(query)
-
-        results = query.all()
-
-        search_results = []
-        for edition in results:
-            # PYTHON solution, but might not work. move the rest up
-            # if author_name and not any(author_name in author.name for author in edition.authors):
-            #     continue
-            # if author_id and not any(author_id == author.id for author in edition.authors):
-            #     continue
-            # if title and title not in edition.title:
-            #     continue
-            # if keyword and not any(keyword in field for field in [edition.title, 
-            #                                                       ', '.join(author.name for author in edition.authors)]):
-            #     continue
-            if language and not any(language == lang.language for lang in edition.languages):
-                continue
-            if start_year and end_year and not (start_year <= edition.publish_date <= end_year):
-                continue
-
-            search_results.append(_edition_to_dict(edition))
-
-        session.close()
-        return search_results
-
-        query = session.query(
-            Editions.id.label('edition_id'),
-            Editions.title,
-            Editions.publish_date,
-            Editions_Covers.cover.label('edition_cover')
-        ).outerjoin(Editions_Covers, Editions.id == Editions_Covers.edition_id)
-
-        if edition_id:
-            query = query.filter(Editions.id == edition_id)
-
-        if work_id:
-            query = query.join(Editions.works).filter(Works.id == work_id)
-
-        if author_name or author_id:
-            query = query.join(Editions.authors)
-            if author_name:
-                query = query.filter(Authors.name.ilike(f'%{author_name}%'))
-            if author_id:
-                query = query.filter(Authors.id == author_id)
-
-        if title:
-            query = query.filter(Editions.title.ilike(f'%{title}%'))
-
-        if keyword:
-            query = query.join(Editions.publish_places).join(Editions.publishers)
-            query = query.filter(or_(
-                Editions.title.ilike(f'%{keyword}%'),
-                Authors.name.ilike(f'%{keyword}%'),
-                Editions.subjects.any(Subjects.subject.ilike(f'%{keyword}%')),
-                Editions.genres.any(Genres.genre.ilike(f'%{keyword}%'))
-            ))
-
-        if language:
-            query = query.join(Editions.languages).filter(Languages.language == language)
-
-        if start_year and end_year:
-            query = query.filter(Editions.publish_date.between(start_year, end_year))
+        query = query.limit(limit).options(
+            joinedload(Editions.authors),
+            joinedload(Editions.publish_places),
+            joinedload(Editions.publishers),
+            joinedload(Editions.editions_covers)
+        )
 
         query = query.limit(limit)
 
-        print(query)
-
         results = query.all()
-        search_results = []
-        
-        for result in results:
-            search_results.append(_edition_to_dict(result))
-
+        books = [_edition_to_dict(edition) for edition in results]
         session.close()
-        return search_results
+
+        return books
 
     except Exception as ex:
         print(ex, file=stderr)
@@ -360,6 +153,36 @@ def search_by_title(title, limit=100):
                             joinedload(Editions.editions_covers)
                         ) \
                         .limit(limit)\
+                        .all()
+
+        books = [_edition_to_dict(edition) for edition in results]
+
+        return books
+
+    except Exception as ex:
+        print(ex, file=stderr)
+        exit(1)
+    finally:
+        session.close()
+
+
+def search_by_author(author_name, limit=100):
+    """
+    find books by author name
+    """
+    try:
+        Session = sessionmaker(bind=engine)
+        session = Session()
+
+        results = session.query(Editions)\
+                        .join(editions_authors, Editions.id == editions_authors.c.edition_id)\
+                        .join(Authors, editions_authors.c.author_id == Authors.id)\
+                        .options(joinedload(Editions.authors), 
+                                                joinedload(Editions.publish_places), 
+                                                joinedload(Editions.publishers), 
+                                                joinedload(Editions.editions_covers))\
+                        .filter(Authors.name.ilike(f'%{author_name}%'))\
+                        .distinct()\
                         .all()
 
         books = [_edition_to_dict(edition) for edition in results]
@@ -405,6 +228,46 @@ def search_by_work(work_id, limit=100):
     finally:
         session.close()
 
+# def search_by_keyword(keyword, limit=100):
+#     """
+#     Search books by a keyword that can be in title or author's name.
+#     Split the keyword into words and match each word against title and author.
+#     """
+#     if not keyword:
+#         return []
+
+#     try:
+#         Session = sessionmaker(bind=engine)
+#         session = Session()
+
+#         results = session.query(Editions)\
+#                         .join(editions_authors, Editions.id == editions_authors.c.edition_id)\
+#                         .join(Authors, editions_authors.c.author_id == Authors.id)\
+#                         .filter(or_(
+#                                 Editions.title.ilike(f'%{keyword}%'),
+#                                 Authors.name.ilike(f'%{keyword}%'),
+#                                 Editions.subjects.any(Subjects.subject.ilike(f'%{keyword}%')),
+#                                 Editions.genres.any(Genres.genre.ilike(f'%{keyword}%'))
+#                         ))\
+#                         .options(
+#                             joinedload(Editions.authors),
+#                             joinedload(Editions.publish_places),
+#                             joinedload(Editions.publishers),
+#                             joinedload(Editions.editions_covers)
+#                         ) \
+#                         .limit(limit)\
+#                         .all()
+
+#         books = [_edition_to_dict(edition) for edition in results]
+
+#         session.close()
+#         return books
+
+#     except Exception as ex:
+#         print(ex, file=stderr)
+#         exit(1)
+#     finally:
+#         session.close()
 
 
 def get_book(book_id):
@@ -542,3 +405,83 @@ def get_author(author_id):
 
 # def delete_book(book_id):
 #     pass
+
+
+def _edition_to_dict(edition):
+    return {
+        'edition_id': edition.id,
+        'title': edition.title,
+        'author': [(author.name, author.id) for author in edition.authors],
+        'publication_place': [place.place for place in edition.publish_places],
+        'publisher': [publisher.publisher for publisher in edition.publishers],
+        'publish_date': edition.publish_date,
+        'edition_cover': edition.editions_covers[0].cover if edition.editions_covers else None
+    }
+
+def _edition_details_dict(edition):
+    try:
+        Session = sessionmaker(bind=engine)
+        session = Session()
+
+        authors_names_ids = session.query(Authors.name, Authors.id)\
+                                    .join(editions_authors, Authors.id == editions_authors.c.author_id)\
+                                    .filter(editions_authors.c.edition_id == edition.id)\
+                                    .distinct()\
+                                    .all()
+
+        places = session.query(Places.place)\
+                        .join(editions_publish_places, Places.id == editions_publish_places.c.place_id)\
+                        .filter(editions_publish_places.c.edition_id == edition.id)\
+                        .distinct()\
+                        .all()
+
+        publishers = session.query(Publishers.publisher)\
+                            .join(editions_publishers, Publishers.id == editions_publishers.c.publisher_id)\
+                            .filter(editions_publishers.c.edition_id == edition.id)\
+                            .all()
+        
+        genres = session.query(Genres.genre)\
+                        .join(editions_genres, Genres.id == editions_genres.c.genre_id)\
+                        .filter(editions_genres.c.edition_id == edition.id)\
+                        .all()
+        
+        subjects = session.query(Subjects.subject)\
+                            .join(editions_subjects, Subjects.id == editions_subjects.c.subject_id)\
+                            .filter(editions_subjects.c.edition_id == edition.id)\
+                            .all()
+
+        cover = session.query(Editions_Covers.cover)\
+                        .filter(Editions_Covers.edition_id == edition.id)\
+                        .first()
+        
+        reviews = session.query(Review.summary, Review.note)\
+                         .filter(Review.book_id == edition.id)\
+                         .limit(REVIEW_LIMIT)\
+                         .all()
+
+        average_rating = session.query(func.avg(Review.rating))\
+                                .filter(Review.book_id == edition.id)\
+                                .scalar()
+        
+        return {
+            'edition_id': edition.id,
+            'title': edition.title,
+            'author': authors_names_ids,
+            'publication_place': [item[0] for item in places],
+            'publisher': [item[0] for item in publishers],
+            'publish_date': edition.publish_date,
+            'edition_name': edition.edition_name,
+            'volume_number': edition.volume_number,
+            'description': edition.description,
+            'genres': [item[0] for item in genres],
+            'subjects': [item[0] for item in subjects],
+            'edition_cover': cover[0] if cover else None,
+            'reviews': reviews,
+            'average_rating': average_rating
+        }
+
+    except Exception as ex:
+        print(ex, file=stderr)
+        exit(1)
+    finally:
+        session.close()

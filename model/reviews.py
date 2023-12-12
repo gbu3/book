@@ -3,7 +3,7 @@
 from sys import argv, stderr, exit
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from model.database import Base, User, Review, Book, List, DB_URL
+from model.database import Base, User, Review, List, DB_URL
 
 engine = create_engine(DB_URL)
 

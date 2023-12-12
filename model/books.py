@@ -1,7 +1,66 @@
 from sys import argv, stderr, exit
 from sqlalchemy import create_engine, or_, and_, func
 from sqlalchemy.orm import sessionmaker, joinedload
-from model.database import DB_URL, Base, User, Review, List, Editions, editions_authors, editions_works, Authors, Places, editions_publish_places, authors_locations, Author_Photos, Publishers, editions_publishers, Editions_Covers, Subjects, Genres, Works, DB_URL
+from model.database import DB_URL, Base, User, Review, List, Editions, editions_authors, editions_works, Authors, editions_genres, editions_subjects, Places, editions_publish_places, authors_locations, Author_Photos, Publishers, editions_publishers, Editions_Covers, Subjects, Genres, Works, DB_URL
+
+"""
+This module provides a set of functions to search a database of books.
+There are two levels of granularity that can be accomplished; 
+ - One for general search results, which returns: 
+    - edition_id
+    - title
+    - author
+    - place of publication
+    - publisher name
+    - publication date
+    - cover integer for edition 
+ - Another for more detailed information about a given book:
+    - edition_id
+    - title
+    - author
+    - place of publication
+    - publisher name
+    - publication date
+    - edition name (if any)
+    - volume number (if any)
+    - description
+    - cover integer for edition 
+    - reviews
+    - ratings (averaged)
+
+So, the return body (dict) will either be top-level edition information:
+simple_edition = {
+    'edition_id',
+    'title',
+    'author',
+    'publication_place',
+    'publisher',
+    'publish_date',
+    'edition_cover'
+}
+or more detailed information for each edition:
+edition_details = {
+    'edition_id',
+    'title',
+    'author',
+    'publication_place',
+    'publisher',
+    'publish_date',
+    'edition_name',
+    'volume_number',
+    'description',
+    'genres',
+    'subjects',
+    'edition_cover',
+    'reviews',
+    'average_rating'
+}
+
+FUNCTIONS
+    search_books(edition_id, work_id, author_name, author_id,
+                 title, keyword, language, start_year, end_year, limit):
+        returns 
+"""
 
 engine = create_engine(DB_URL)
 
@@ -94,6 +153,16 @@ def _edition_details_dict(edition):
                             .join(editions_publishers, Publishers.id == editions_publishers.c.publisher_id)\
                             .filter(editions_publishers.c.edition_id == edition.id)\
                             .all()
+        
+        genres = session.query(Genres.genre)\
+                        .join(editions_genres, Genres.id == editions_genres.c.genre_id)\
+                        .filter(editions_genres.c.edition_id == edition.id)\
+                        .all()
+        
+        subjects = session.query(Subjects.subject)\
+                            .join(editions_subjects, Subjects.id == editions_subjects.c.subject_id)\
+                            .filter(editions_subjects.c.edition_id == edition.id)\
+                            .all()
 
         cover = session.query(Editions_Covers.cover)\
                         .filter(Editions_Covers.edition_id == edition.id)\
@@ -115,6 +184,11 @@ def _edition_details_dict(edition):
             'publication_place': [item[0] for item in places],
             'publisher': [item[0] for item in publishers],
             'publish_date': edition.publish_date,
+            'edition_name': edition.edition_name,
+            'volume_number': edition.volume_number,
+            'description': edition.description,
+            'genres': genres,
+            'subjects': subjects,
             'edition_cover': cover[0] if cover else None,
             'reviews': reviews,
             'average_rating': average_rating

@@ -13,18 +13,25 @@
     left: 0;
 }
 
-.logo img {
+/* .logo img {
     width: 100px;
     height: auto;
     padding: 14px 16px;
+} */
+
+.logo {
+    /* display: flex;
+    align-items: center;
+    justify-content: flex-end; */
+    flex-grow: 1;
 }
 
-.nav-items {
+.nav-items, .logo {
     display: flex;
     align-items: center;
 }
 
-.nav-items a {
+.nav-items a, .logo span {
     color: #f2f2f2;
     text-align: center;
     padding: 14px 16px;

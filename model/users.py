@@ -1,7 +1,9 @@
 from sys import argv, stderr, exit
 from sqlalchemy import create_engine
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import sessionmaker
 from model.database import Base, User, Review, List, DB_URL
+from model.reviews import user_review_to_dict
 
 engine = create_engine(DB_URL)
 
@@ -17,13 +19,24 @@ def _user_to_dict(user):
         "username": user.username,
         "full_name": user.full_name,
         "email": user.email,
-        "phone": user.phone
+        "phone": user.phone,
         # "metadata_info": user.metadata_info,
-        # "lists": [list_to_dict(lst) for lst in user.lists],
-        # "reviews": [review_to_dict(review) for review in user.reviews],
-        # "liked_lists": [list_to_dict(lst) for lst in user.liked_lists],
-        # "following": [user_to_minimal_dict(u) for u in user.following],
-        # "followers": [user_to_minimal_dict(u) for u in user.followers]
+        # "lists": [(lst.list_id, lst.title) for lst in user.lists], #TODO: CHANGE
+        "reviews": [user_review_to_dict(review) for review in user.reviews[:5]],
+        "following": [follower_to_dict(u) for u in user.following],
+        "followers": [follower_to_dict(u) for u in user.followers]
+    }
+
+def follower_to_dict(user):
+    """
+    creates a very minimal dict for follower/following display
+    """
+    if not user:
+        return None
+    
+    return {
+        "user_id": user.user_id,
+        "username": user.username
     }
 
 def search_users(user_id, username, full_name, email, limit):
@@ -47,18 +60,26 @@ def search_users(user_id, username, full_name, email, limit):
             if email:
                 query = query.filter(User.email == email)
 
-        users = query.limit(limit).all()
+        search_results = query.limit(limit).all()
         
-        if not users:
+        if not search_results:
             return None
 
         # TODO: will likely want to add stuff about the lists/reviews/etc later
         # but I think those should go in separate functions
-        return [_user_to_dict(user) for user in users]
+        users = [_user_to_dict(user) for user in search_results]
 
+        session.close()
+
+        return users
+
+    except SQLAlchemyError as e:
+        session.rollback()
+        print(f"Database error: {e}")
+        return None
     except Exception as ex:
-        print(ex, file=stderr)
-        exit(1)
+        print(f"Error: {ex}")
+        return None
     finally:
         session.close()
 
@@ -72,38 +93,57 @@ def get_user_info(user_id):
 
         user = session.query(User).filter_by(user_id=user_id).first()
 
-        session.close()
-
         if not user:
-            return None
+            ret = None
         else:
-            return _user_to_dict(user)
+            ret = _user_to_dict(user)
 
+        session.close()
+        return ret
+
+    except SQLAlchemyError as e:
+        session.rollback()
+        print(f"Database error: {e}")
+        return None
     except Exception as ex:
-        print(ex, file=stderr)
-        exit(1)
+        print(f"Error: {ex}")
+        return None
     finally:
         session.close()
 
 def get_user_by_email(email):
-    Session = sessionmaker(bind=engine)
-    session = Session()
     try:
+        Session = sessionmaker(bind=engine)
+        session = Session()
+
         user = session.query(User).filter_by(email=email).first()
         return user
+    
+    except SQLAlchemyError as e:
+        session.rollback()
+        print(f"Database error: {e}")
+        return None
     except Exception as ex:
-        print(ex, file=stderr)
+        print(f"Error: {ex}")
+        return None
     finally:
         session.close()
 
 def get_user_by_username(username):
-    Session = sessionmaker(bind=engine)
-    session = Session()
     try:
+        Session = sessionmaker(bind=engine)
+        session = Session()
+
         user = session.query(User).filter_by(username=username).first()
         return user
+    
+    except SQLAlchemyError as e:
+        session.rollback()
+        print(f"Database error: {e}")
+        return None
     except Exception as ex:
-        print(ex, file=stderr)
+        print(f"Error: {ex}")
+        return None
     finally:
         session.close()
 
@@ -128,15 +168,19 @@ def is_a_follower(user2, user1):
         
         return False
 
+    except SQLAlchemyError as e:
+        session.rollback()
+        print(f"Database error: {e}")
+        return None
     except Exception as ex:
-        print(ex, file=stderr)
-        exit(1)
+        print(f"Error: {ex}")
+        return None
     finally:
         session.close()
 
 def get_followers(user_id):
     """
-    returns a list of user dicts for all followers of
+    returns a list of user_id and usernames for all followers of
     the given user id.
     """
     try:
@@ -150,21 +194,25 @@ def get_followers(user_id):
 
         followers = []
         for follower in user.followers:
-            followers.append(_user_to_dict(follower))
+            followers.append(follower_to_dict(follower))
 
         return followers
 
         # print(f"{user.username} followers: {[follower.username for follower in user.followers]}, following: {[followee.username for followee in user.following]}")            
 
+    except SQLAlchemyError as e:
+        session.rollback()
+        print(f"Database error: {e}")
+        return None
     except Exception as ex:
-        print(ex, file=stderr)
-        exit(1)
+        print(f"Error: {ex}")
+        return None
     finally:
         session.close()
 
 def get_following(user_id):
     """
-    returns a list of user dicts that the given user is following
+    returns a list of user_id and usernames that the given user is following
     """
     try:
         Session = sessionmaker(bind=engine)
@@ -177,15 +225,19 @@ def get_following(user_id):
 
         following = []
         for usr in user.following:
-            following.append(_user_to_dict(usr))
+            following.append(follower_to_dict(usr))
 
         return following
 
         # print(f"{user.username} followers: {[follower.username for follower in user.followers]}, following: {[followee.username for followee in user.following]}")            
 
+    except SQLAlchemyError as e:
+        session.rollback()
+        print(f"Database error: {e}")
+        return None
     except Exception as ex:
-        print(ex, file=stderr)
-        exit(1)
+        print(f"Error: {ex}")
+        return None
     finally:
         session.close()
 
@@ -229,9 +281,13 @@ def create_user(username, full_name, email, phone, password):
 
         return {"user_id": created_user_id, "user_name": username}
 
+    except SQLAlchemyError as e:
+        session.rollback()
+        print(f"Database error: {e}")
+        return None
     except Exception as ex:
-        print(ex, file=stderr)
-        exit(1)
+        print(f"Error: {ex}")
+        return None
     finally:
         session.close()
 
@@ -253,9 +309,13 @@ def update_user_name(user_id, username):
 
         return ret
 
+    except SQLAlchemyError as e:
+        session.rollback()
+        print(f"Database error: {e}")
+        return None
     except Exception as ex:
-        print(ex, file=stderr)
-        exit(1)
+        print(f"Error: {ex}")
+        return None
     finally:
         session.close()
 
@@ -277,9 +337,13 @@ def update_full_name(user_id, full_name):
 
         return ret
 
+    except SQLAlchemyError as e:
+        session.rollback()
+        print(f"Database error: {e}")
+        return None
     except Exception as ex:
-        print(ex, file=stderr)
-        exit(1)
+        print(f"Error: {ex}")
+        return None
     finally:
         session.close()
 
@@ -300,10 +364,13 @@ def update_user_email(user_id, email):
 
         return ret
 
+    except SQLAlchemyError as e:
+        session.rollback()
+        print(f"Database error: {e}")
+        return None
     except Exception as ex:
-        print(ex, file=stderr)
-        exit(1)
-
+        print(f"Error: {ex}")
+        return None
     finally:
         session.close()
 
@@ -327,10 +394,15 @@ def follow_user(user1, user2):
         session.commit()
 
         print(f"{follower.username} ({follower_id}) successfully followed {user_to_follow.username} ({user_id_to_follow})")
+        return
 
+    except SQLAlchemyError as e:
+        session.rollback()
+        print(f"Database error: {e}")
+        return None
     except Exception as ex:
-        print(ex, file=stderr)
-        exit(1)
+        print(f"Error: {ex}")
+        return None
     finally:
         session.close()
 
@@ -361,10 +433,15 @@ def unfollow_user(user1, user2):
         session.commit()
 
         print(f"{follower.username} ({follower_id}) successfully unfollowed {user_to_unfollow.username} ({user_id_to_unfollow})")
-
+        return
+    
+    except SQLAlchemyError as e:
+        session.rollback()
+        print(f"Database error: {e}")
+        return None
     except Exception as ex:
-        print(ex, file=stderr)
-        exit(1)
+        print(f"Error: {ex}")
+        return None
     finally:
         session.close()
 
@@ -385,8 +462,12 @@ def delete_user(user_id):
 
         return ret
 
+    except SQLAlchemyError as e:
+        session.rollback()
+        print(f"Database error: {e}")
+        return None
     except Exception as ex:
-        print(ex, file=stderr)
-        exit(1)
+        print(f"Error: {ex}")
+        return None
     finally:
         session.close()

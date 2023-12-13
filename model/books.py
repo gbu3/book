@@ -1,5 +1,6 @@
 from sys import argv, stderr, exit
 from sqlalchemy import create_engine, or_, and_, func
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import sessionmaker, joinedload, aliased
 from model.database import DB_URL, Base, User, Review, List, Editions, editions_authors, editions_works, Authors, editions_genres, editions_subjects, Places, editions_publish_places, authors_locations, Author_Photos, Publishers, editions_publishers, Editions_Covers, Subjects, Genres, Works, DB_URL
 
@@ -53,7 +54,8 @@ They will be returned in such a dict:
 
 FUNCTIONS
     ** largest search API: layers filters on top of each other **
-    search_editions(edition_id, work_id, author_name, author_id, title, limit):
+    search_editions(edition_id, work_id, author_name, author_id, 
+                    title, publisher_name, publish_date, limit):
         returns [simple_editions]
     
     ** smaller search APIs, based on specific inputs **
@@ -67,6 +69,13 @@ FUNCTIONS
     ** get edition details **
     get_edition(edition):
         returns edition_details
+    get_edition_title_cover_authors(edition_id)
+        returns {
+            "edition_id": edition.id,
+            "title": string,
+            "cover": integer,
+            "authors": string
+        }
     
     ** authors: search author and get **
     search_author(author_name, author_id, limit):
@@ -81,7 +90,8 @@ engine = create_engine(DB_URL)
 REVIEW_LIMIT = 10
 
 def search_editions(edition_id=None, work_id=None, author_name=None, 
-                 author_id=None, title=None, limit=100): 
+                 author_id=None, title=None, publisher_name=None,
+                 publish_date=None, limit=100): 
     """
     search by:
     - title
@@ -122,6 +132,14 @@ def search_editions(edition_id=None, work_id=None, author_name=None,
         if title:
             query = query.filter(Editions.title.ilike(f'%{title}%'))
 
+        if publish_date:
+            query = query.filter(Editions.publish_date == publish_date)
+
+        if publisher_name:
+            PublisherAlias = aliased(Publishers)
+            query = query.join(PublisherAlias, Editions.publishers).filter(PublisherAlias.publisher.ilike(f'%{publisher_name}%'))
+
+
         query = query.limit(limit).options(
             joinedload(Editions.authors),
             joinedload(Editions.publish_places),
@@ -137,9 +155,13 @@ def search_editions(edition_id=None, work_id=None, author_name=None,
 
         return books
 
+    except SQLAlchemyError as e:
+        session.rollback()
+        print(f"Database error: {e}")
+        return None
     except Exception as ex:
-        print(ex, file=stderr)
-        exit(1)
+        print(f"Error: {ex}")
+        return None
     finally:
         session.close()
 
@@ -172,12 +194,15 @@ def search_by_title(title, limit=100):
 
         return books
 
+    except SQLAlchemyError as e:
+        session.rollback()
+        print(f"Database error: {e}")
+        return None
     except Exception as ex:
-        print(ex, file=stderr)
-        exit(1)
+        print(f"Error: {ex}")
+        return None
     finally:
         session.close()
-
 
 def search_by_author(author_id=None, author_name=None, limit=100):
     """
@@ -223,9 +248,13 @@ def search_by_author(author_id=None, author_name=None, limit=100):
 
         return books
 
+    except SQLAlchemyError as e:
+        session.rollback()
+        print(f"Database error: {e}")
+        return None
     except Exception as ex:
-        print(ex, file=stderr)
-        exit(1)
+        print(f"Error: {ex}")
+        return None
     finally:
         session.close()
 
@@ -258,9 +287,13 @@ def search_by_work(work_id, limit=100):
 
         return books
 
+    except SQLAlchemyError as e:
+        session.rollback()
+        print(f"Database error: {e}")
+        return None
     except Exception as ex:
-        print(ex, file=stderr)
-        exit(1)
+        print(f"Error: {ex}")
+        return None
     finally:
         session.close()
 
@@ -277,11 +310,63 @@ def get_edition(edition_id):
                         .filter_by(id=edition_id)\
                         .first()
 
+        if not edition:
+            print(f"Edition {edition_id} not found")
+            return None
+
         return _edition_details_dict(edition)
 
+    except SQLAlchemyError as e:
+        session.rollback()
+        print(f"Database error: {e}")
+        return None
     except Exception as ex:
-        print(ex, file=stderr)
-        exit(1)
+        print(f"Error: {ex}")
+        return None
+    finally:
+        session.close()
+
+def get_edition_title_cover_authors(edition_id):
+    """
+    for use by reviews module: get all the basic information
+    about a book, title and cover, to store
+    """
+    try:
+        Session = sessionmaker(bind=engine)
+        session = Session()
+
+        edition = session.query(Editions)\
+                        .filter_by(id=edition_id)\
+                        .first()
+        
+        if not edition:
+            print(f"Edition {edition_id} not found")
+            return None
+        
+        cover = session.query(Editions_Covers.cover)\
+                        .filter(Editions_Covers.edition_id == edition.id)\
+                        .first()
+        
+        authors_names = session.query(Authors.name)\
+                                .join(editions_authors, Authors.id == editions_authors.c.author_id)\
+                                .filter(editions_authors.c.edition_id == edition.id)\
+                                .distinct()\
+                                .all()
+
+        return {
+            "edition_id": edition.id,
+            "title": edition.title,
+            "cover": cover[0] if cover else None,
+            "authors": ', '.join(t[0] for t in authors_names)
+        }
+
+    except SQLAlchemyError as e:
+        session.rollback()
+        print(f"Database error: {e}")
+        return None
+    except Exception as ex:
+        print(f"Error: {ex}")
+        return None
     finally:
         session.close()
 
@@ -316,9 +401,13 @@ def search_author(author_name=None, author_id=None, limit=100):
 
         return authors
 
+    except SQLAlchemyError as e:
+        session.rollback()
+        print(f"Database error: {e}")
+        return None
     except Exception as ex:
-        print(ex, file=stderr)
-        exit(1)
+        print(f"Error: {ex}")
+        return None
     finally:
         session.close()
 
@@ -337,9 +426,13 @@ def get_author(author_id):
 
         return _author_to_dict(author)
 
+    except SQLAlchemyError as e:
+        session.rollback()
+        print(f"Database error: {e}")
+        return None
     except Exception as ex:
-        print(ex, file=stderr)
-        exit(1)
+        print(f"Error: {ex}")
+        return None
     finally:
         session.close()
 
@@ -351,7 +444,6 @@ def get_author(author_id):
 
 # def delete_book(book_id):
 #     pass
-
 
 def _edition_to_dict(edition):
     """
@@ -434,9 +526,13 @@ def _edition_details_dict(edition):
             'average_rating': average_rating
         }
 
+    except SQLAlchemyError as e:
+        session.rollback()
+        print(f"Database error: {e}")
+        return None
     except Exception as ex:
-        print(ex, file=stderr)
-        exit(1)
+        print(f"Error: {ex}")
+        return None
     finally:
         session.close()
 
@@ -466,13 +562,17 @@ def _author_to_dict(author):
             "personal_name": author.personal_name,
             "birth_date": author.birth_date,
             "death_date": author.death_date,
-            # "entity_type": author.entity_type,
             "bio": author.bio,
             "locations": [item[0] for item in locations],
             "author_photo": photo[0] if photo else None
         }
+    
+    except SQLAlchemyError as e:
+        session.rollback()
+        print(f"Database error: {e}")
+        return None
     except Exception as ex:
-        print(ex, file=stderr)
-        exit(1)
+        print(f"Error: {ex}")
+        return None
     finally:
         session.close()

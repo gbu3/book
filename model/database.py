@@ -68,6 +68,7 @@ class Review(Base):
     book_id = Column(String, ForeignKey('editions.id'))
     book_title = Column(String)
     book_cover = Column(Integer)
+    author_names = Column(String)
     summary = Column(String)
     note = Column(String)
     rating = Column(Integer)
@@ -91,17 +92,6 @@ class List(Base):
     creator = relationship('User', back_populates='lists')
     liked_by = relationship('User', secondary='likes', back_populates='liked_lists')
     books = relationship('Editions', secondary='list_books', back_populates='lists')
-
-# class Book(Base):
-#     __tablename__ = 'books'
-
-#     book_id = Column(Integer, primary_key=True)
-#     # genre = Column(String)
-#     # metadata_info = Column(String)
-
-#     reviews = relationship('Review', back_populates='book')
-#     lists = relationship('List', secondary=list_book_association, back_populates='books')
-
 
 # ---------------- EDITIONS ----------------
 

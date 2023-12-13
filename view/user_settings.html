@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>BŪK</title>
+    <!-- link to style sheet -->
+    <link rel="stylesheet" href="/static/stylesheet.css" />
+</head>
+
+<body>
+    {% include 'header.html' %}
+    <div class="content-wrapper">
+        <h1 id="userHeader">Settings for {{username}}</h1>
+        <!-- Update Username Form -->
+        <h2>Update Username</h2>
+        <form action="/update_username" method="post">
+            <input type="hidden" name="user_id" value="{{ user_id }}" />
+            New Username:
+            <input type="text" id="name" name="name" required /><br />
+            <input type="submit" value="Update Username" />
+        </form>
+
+        <!-- Update Email Form -->
+        <h2>Update Email</h2>
+        <form action="/update_email" method="post">
+            <input type="hidden" name="user_id" value="{{ user_id }}" />
+            New Email:
+            <input type="text" id="email" name="email" /><br />
+            <input type="submit" value="Update Email" />
+        </form>
+
+        <!-- Update Phone Form -->
+        <h2>Update Phone Number</h2>
+        <form action="/update_phone" method="post">
+            <input type="hidden" name="user_id" value="{{ user_id }}" />
+            New Phone Number:
+            <input type="text" id="phone" name="phone" /><br />
+            <input id="button" type="submit" value="Update Phone" />
+        </form>
+
+        <br />
+        <a href="/users?user_id={{user_id}}">Back to profile page</a>
+    </div>
+<!-- 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        "use strict";
+        // Update Classroom Name
+        $("#updateNameForm").submit(function (event) {
+            event.preventDefault();
+            var newName = $("#newClassroomName").val();
+            console.log("New Classroom Name:", newName);
+            var formData = $(this).serialize();
+            $.ajax({
+                url: '/classrooms/update/name',
+                type: 'PUT',
+                data: formData,
+                success: function (response) {
+                    if (response.success) {
+                        $("#classroomName").text(newName);
+                        $("#classroomHeader").text("Settings for " + newName);
+                    }
+                    alert(response.message);
+                },
+                error: function (xhr, status, error) {
+                    alert("Error updating name: " + xhr.responseText);
+                }
+            });
+        });
+
+        // Update Classroom Bio
+        $("#updateBioForm").submit(function (event) {
+            event.preventDefault();
+            var newBio = $("#newClassroomBio").val();
+
+            var formData = $(this).serialize();
+            $.ajax({
+                url: '/classrooms/update/bio',
+                type: 'PUT',
+                data: formData,
+                success: function (response) {
+                    if (response.success) {
+                        $("#classroomBio").text(newBio);
+                    }
+                    alert(response.message);
+                },
+                error: function (xhr, status, error) {
+                    alert("Error updating bio: " + xhr.responseText);
+                }
+            });
+        });
+
+        // Delete Classroom
+        $("#deleteClassroomForm").submit(function (event) {
+            event.preventDefault();
+            var formData = $(this).serialize();
+            $.ajax({
+                url: '/classrooms/delete',
+                type: 'DELETE',
+                data: formData,
+                success: function (response) {
+                    alert(response.message);
+                    window.location.href = '/index';
+                },
+                error: function (xhr, status, error) {
+                    alert("Error deleting classroom: " + xhr.responseText);
+                }
+            });
+        });
+    </script> -->
+    {% include 'footer.html' %}
+</body>
+
+</html>

@@ -1,20 +1,18 @@
 <!DOCTYPE html>
 <html>
-
-<head>
-    <title>BŪK</title>
+  <head>
+    <title>Oops!</title>
     <link rel="stylesheet" href="/static/stylesheet.css" />
-</head>
-<style></style>
+  </head>
 
-<body>
+  <body>
     {% include 'header.html' %}
     <div class="content-wrapper">
-        <h1>BŪK</h1>
+      <h1>Oops! Something went wrong.</h1>
+      <br />
+      <div>{{error_message}}</div>
     </div>
-
     <br />
     {% include 'footer.html' %}
-</body>
-
+  </body>
 </html>

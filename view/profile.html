@@ -1,0 +1,59 @@
+<!-- {"username": user.username, "email": user.email, "phone": user.phone} -->
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>BŪK</title>
+    <link rel="stylesheet" href="/static/stylesheet.css" />
+</head>
+
+<body>
+    {% include 'header.html' %}
+    <div class="content-wrapper">
+        {% if name == None: %}
+        <h1>User not found.</h1>
+
+        {% else %}
+        <h1>{{full_name}}</h1>
+        Username: {{username}}<br />
+        Full name: {{full_name}}<br />
+        Email: {{email}}<br />
+        Phone: {{phone}}<br />
+        Reviews: {{reviews}}<br />
+        <div class="following-list">
+            Following: 
+            {% if not following %}
+            Not following any users.
+            {% else %}
+            {% for user in following %}
+                <a href="users?user_id={{ user['user_id'] }}">{{ user['username'] }}</a>{% if not loop.last %}, {% endif %}
+            {% endfor %}
+            {% endif %}
+        </div>
+        <div class="follower-list">
+            Followers: 
+            {% if not following %}
+            Not followed by any users.
+            {% else %}
+            {% for user in followers %}
+                <a href="users?user_id={{ user['user_id'] }}">{{ user['username'] }}</a>{% if not loop.last %}, {% endif %}
+            {% endfor %}
+            {% endif %}
+        </div>
+
+        {% endif %}
+        <br />
+        {% if current_user.is_authenticated and current_user.user_id == user_id %}
+            <br />
+            <a href="/users/settings?user_id={{user_id}}&username={{username}}&full_name={{full_name}}">
+            User settings
+            </a>
+            <br />
+        {% endif %}
+    </div>
+
+    {% include 'footer.html' %}
+</body>
+
+</html>

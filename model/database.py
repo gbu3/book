@@ -66,6 +66,8 @@ class Review(Base):
     review_id = Column(Integer, primary_key=True)
     reviewer_id = Column(Integer, ForeignKey('users.user_id'))
     book_id = Column(String, ForeignKey('editions.id'))
+    book_title = Column(String)
+    book_cover = Column(Integer)
     summary = Column(String)
     note = Column(String)
     rating = Column(Integer)

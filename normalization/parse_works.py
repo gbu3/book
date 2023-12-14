@@ -1,5 +1,6 @@
 import json
 from random import random 
+from utils import remove_special_char
 
 """
 takes the ol_dump and based on different fields
@@ -7,17 +8,11 @@ that are deemed necessary, generates work csvs
 from the json data column for input into db
 """
 
-def remove_special_char(s):
-    if not isinstance(s,str):
-        return s
-    tmp_s = s.replace('\\t', ' ').replace('\\r',' ').replace('\\n',' ')
-    return tmp_s.replace('\t', ' ').replace('\r',' ').replace('\n',' ').replace('\x08',' ').replace('\uf076',' ')
-
 def main():
-    fields_var = ['key','created', 'last_modified','revision','latest_revision','title',  'subtitle', 'first_publish_date','description', 'number_of_editions']
-    fields_arr = ['covers', 'authors','original_languages','lc_classifications', 'subjects','other_titles','translated_titles','cover_editions','dewey_number']
-
+    # file for recording all non list fields for works entries
     f_works = open("works.csv","w")
+
+    # file for recording all list fields for works entries
     f_covers = open("works_covers.csv","w")
     f_authors = open("works_authors.csv","w")
     f_original_languages = open("works_orginal_languages.csv","w")
@@ -28,20 +23,18 @@ def main():
     f_cover_editions = open("works_cover_editions.csv","w")
     f_dewey_number = open("works_dewey_number.csv","w")
 
-    with open("ol_dump_latest.txt", 'r') as file:
-        
+    with open("../ol_dump_latest.txt", 'r') as file:
+
         for line in file:
             try:
+
                 if "/type/work" not in line:
                     continue
 
                 columns = line.split('\t')
-                #json_data = columns[-1].replace('\n',' ').replace('\r',' ')
-
                 json_data = columns[-1]
-                
                 data = json.loads(json_data)
-                #print(data)        
+
                 if 'key' in data:
                     work = data['key'].split("/")[-1]
                     if work.startswith("OL"):
@@ -50,6 +43,8 @@ def main():
                         continue
                 else:
                     continue
+
+                # ---------- NON-LIST FIELDS ----------
 
                 if 'created' in data:
                     f_works.write(f"\t{remove_special_char(data['created']['value'])}")
@@ -111,6 +106,9 @@ def main():
 
                 f_works.write(f"\n")
 
+
+                # ---------- LIST FIELDS ----------
+
                 if 'covers' in data:
                     for c in data['covers']:
                         f_covers.write(f"{remove_special_char(work)}\t{remove_special_char(c)}\n")
@@ -157,13 +155,10 @@ def main():
                 if 'dewey_number' in data:
                     for dn in data['dewey_number']:
                         f_dewey_number.write(f"{work}\t{remove_special_char(dn)}\n")
-            
             except Exception as e:
                 print(e)
                 print(line)
                 print()
-                
-    # fields_arr = ['covers', 'authors','original_languages','lc_classifications', 'subjects','other_titles','translated_titles','cover_editions','dewey_number']
 
     f_works.close()
     f_covers.close()
@@ -175,6 +170,9 @@ def main():
     f_translated_titles.close()
     f_cover_editions.close()
     f_dewey_number.close()
+
+
+
 
 
 if __name__ == '__main__':

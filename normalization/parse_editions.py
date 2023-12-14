@@ -1,6 +1,7 @@
 import json
 from random import random 
 import time
+from utils import remove_special_char
 
 """
 takes the ol_dump and based on different fields
@@ -9,7 +10,10 @@ from the json data column for input into db
 """
 
 def main():
+    # store all non list type of fields for edition entries
     f_editions = open("editions.csv","w")
+
+    # store all list type of fields for edition entries
     f_covers = open("editions_covers.csv","w")
     f_authors = open("editions_authors.csv","w")
     f_contributors = open('editions_contributors.csv',"w")
@@ -25,18 +29,8 @@ def main():
     f_subjects = open("editions_subjects.csv","w")
     f_isbn10 = open("editions_isbn_10.csv","w")
     f_isbn13 = open("editions_isbn_13.csv","w")
-    # f_ = open('editions_.csv',"w")
-    # ['authors','covers','contributors','genres','languages','lc_classifications', 'lccn','publish_places', 'publishers','series','subjects','work_titles','works']
 
-    start_time = time.time()
-
-    def remove_special_char(s):
-        if not isinstance(s,str):
-            return s
-        tmp_s = s.replace('\\t', ' ').replace('\\r',' ').replace('\\n',' ')
-        return tmp_s.replace('\t', ' ').replace('\r',' ').replace('\n',' ').replace('\x08',' ').replace('\uf076',' ')
-
-    with open("ol_dump_latest.txt", 'r') as file:
+    with open("../ol_dump_latest.txt", 'r') as file:
         round = 0
         for line in file:
             try:
@@ -46,7 +40,8 @@ def main():
                 columns = line.split('\t')
                 json_data = columns[-1]
                 data = json.loads(json_data)
-                      
+                
+                        
                 if 'key' in data:
                     edition = data['key'].split("/")[-1]
                     if edition.startswith("OL"):
@@ -226,9 +221,23 @@ def main():
                     for pp in data['publishers']:
                         f_publishers.write(f"{edition}\t{remove_special_char(pp)}\n")
                     
+
+                skipnext = False
                 if 'series' in data:
-                    for s in data['series']:
-                        f_series.write(f"{edition}\t{remove_special_char(s)}\n")
+                    for i in range(len(data['series'])):
+                        if skipnext:
+                            skipnext = False
+                            continue
+                        if i==(len(data['series'])-1):
+                            f_series.write(f"{edition}\t{remove_special_char(data['series'][i])}\n")
+                            continue
+                        numbers = sum(c.isdigit() for c in data['series'][i+1])
+                        letters = sum(c.isalpha() for c in data['series'][i+1])
+                        if numbers > 1 or (numbers==1 and letters < 5 ):
+                            f_series.write(f"{edition}\t{remove_special_char(data['series'][i])} {remove_special_char(data['series'][i+1])}\n")
+                            skipnext = True
+                        else:
+                            f_series.write(f"{edition}\t{remove_special_char(data['series'][i])}\n")
                         
                 if 'subjects' in data:
                     for s in data['subjects']:
@@ -252,13 +261,11 @@ def main():
                         if 'key' in w:
                             wk = w['key'].split('/')[-1]
                         f_works.write(f"{edition}\t{remove_special_char(wk)}\n")
-                
+
             except Exception as e:
                 print(e)
                 print(line)
                 print()
-
-    print("--- %s seconds ---" % (time.time() - start_time)) # was 2746.689626932144 seconds
 
     f_editions.close()
     f_covers.close() 
@@ -276,34 +283,6 @@ def main():
     f_subjects.close()
     f_isbn10.close()
     f_isbn13.close()
-
-    fields_var = []
-    fields_arr = []
-
-    with open("ol_dump_latest.txt", 'r') as file:
-        round = 0
-        for line in file:
-            if "/type/edition" in line:
-                if round>1000000:
-                    break
-                round+=1
-                columns = line.split('\t')
-                json_data = columns[-1]
-                data = json.loads(json_data)
-                
-                for fld in data:
-                    if isinstance(data[fld], list):
-                        if fld not in fields_arr:
-                            fields_arr.append(fld)
-                    else:
-                        if fld not in fields_var:
-                            fields_var.append(fld)
-
-    print(fields_var)
-    # ['birth_date', 'body', 'bookweight', 'by_statement', 'classifications', 'copyright_date', 'coverimage', 'create', 'created', 'description', 'edition', 'edition_name', 'expected_type', 'first_sentence', 'full_title', 'ia_box_id', 'ia_id', 'ia_loaded_id', 'identifiers', 'key', 'last_modified', 'latest_revision', 'm', 'macro', 'name', 'notes', 'number_of_pages', 'ocaid', 'openlibrary', 'original_isbn', 'pagination', 'physical_dimensions', 'physical_format', 'plugin', 'property_name', 'publish_country', 'publish_date', 'revision', 'scan_on_demand', 'subtitle', 'title', 'title_prefix', 'translation_of', 'type', 'volume_number', 'weight', 'word_count']
-
-    print(fields_arr)
-    # ['authors','covers','contributors','genres','languages','lc_classifications', 'lccn','publish_places', 'publishers','series','subjects','work_titles','works']
 
 if __name__ == '__main__':
     main()

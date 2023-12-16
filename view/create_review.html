@@ -30,18 +30,18 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
-<script>
-    function updateCharCount() {
-        var charCount = document.getElementById("summary").value.length;
-        var charLimit = document.querySelector("input[name='char_limit']").value;
-        var remainingChars = charLimit - charCount;
-        document.getElementById("charCount").innerText = remainingChars + " characters remaining";
-    }
+    <script>
+        function updateCharCount() {
+            var charCount = document.getElementById("summary").value.length;
+            var charLimit = document.querySelector("input[name='char_limit']").value;
+            var remainingChars = charLimit - charCount;
+            document.getElementById("charCount").innerText = remainingChars + " characters remaining";
+        }
 
-    window.onload = function() {
-        updateCharCount();
-    };
-</script>
+        window.onload = function() {
+            updateCharCount();
+        };
+    </script>
 </body>
 
 </html>

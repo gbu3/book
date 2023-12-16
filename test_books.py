@@ -1,4 +1,9 @@
 import model.books as books
+import model.reviews as reviews
+import model.lists as lists
+
+sanshiro = 'OL33968511M'
+kundera = 'OL3187189M'
 
 def test_search_all():
     # edition_id = 'OL1000302M'
@@ -6,7 +11,7 @@ def test_search_all():
     # author_name = 'soseki'
     # author_id = 'OL10004777A'
     title = 'the unbearable lightness of being'
-    publisher_name = 'harper'
+    # publisher_name = 'harper'
 
     # keyword = 'Russia'
     # language = 'French'
@@ -18,6 +23,7 @@ def test_search_all():
     author_name = None
     author_id = None
     # title = None
+    publisher_name = None
 
     # keyword = None
     # language = None
@@ -88,6 +94,24 @@ def test_get_edition_title_cover_authors():
     result = books.get_edition_title_cover_authors(edition_id=edition_id)
     print(result)
 
+def test_get_reviews(edition_id):
+    print("test_get_reviews")
+    result = reviews.get_reviews(book_id=edition_id)
+    print(result)
+    print()
+
+def test_get_lists(edition_id):
+    print("test_get_lists")
+    result = lists.get_lists(book_id=edition_id)
+    print(result)
+    print()
+
+def test_get_edition_info(edition_id):
+    print("test_get_edition_info")
+    result = books.get_edition_info(edition_id)
+    print(result)
+    print()
+
 
 if __name__ == '__main__':
-    test_get_edition_title_cover_authors()
+    test_get_edition_info('OL33968511M')

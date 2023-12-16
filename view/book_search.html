@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>BŪK</title>
+    <!-- link to style sheet -->
+    <link rel="stylesheet" href="/static/stylesheet.css" />
+</head>
+
+<body>
+    {% include 'header.html' %}
+    <div class="content-wrapper">
+        <h1>Search for a book:</h1>
+        <form action="/books/search" method="get">
+            <div class="inputs">
+                <div>Book ID</div>
+                <input type="text" name="edition_id" value="{{edition_id}}" /> <br /><br />
+                <div>Work ID</div>
+                <input type="text" name="work_id" value="{{work_id}}" /> <br /><br />
+                <div>Author ID</div>
+                <input type="text" name="author_id" value="{{author_id}}" /> <br /><br />
+                <div>Author name</div>
+                <input type="text" name="author_name" value="{{author_name}}" /><br /><br />
+                <div>Title</div>
+                <input type="text" name="title" value="{{title}}" /><br /><br />
+                <div>Publisher name</div>
+                <input type="text" name="publisher_name" value="{{publisher_name}}" /><br /><br />
+                <div>Publish date</div>
+                <input type="text" name="publish_date" value="{{publish_date}}" /><br /><br />
+                <div>Limit search results #</div>
+                <input type="text" name="limit" value="{{limit}}" /> <br /><br />
+            </div>
+            <input type="submit" value="Search" />
+        </form>
+
+        <br />
+        <br />
+        {% if valid_search_terms: %} 
+            <h2>Search Results:</h2>
+            {% if not results or results|length == 0: %}
+            <br />
+            {% else %}
+                {% for book in results %}
+                    <a href="/books/{{ book['edition_id'] }}">{{ book['title'] }}</a>
+                    By 
+                    {% for author in book['authors'] %}
+                    <a href="/authors/{{ author[1] }}">{{ author[0] }}</a>{% if not loop.last %}, {% endif %}
+                    {% endfor %}
+                    <br />
+                    Published: {{ book['publish_date'] }} by 
+                    {% for pub in book['publisher'] %}
+                    {{pub}}{% if not loop.last %}, {% endif %}
+                    {% endfor %}
+                    <br />
+                    <br />
+                {% endfor %}
+            {% endif %}
+        {% else %}
+        <p>No search terms provided. Please enter some search terms.</p>
+        {% endif %}
+    </div>
+    <br />
+    {% include 'footer.html' %}
+</body>
+
+</html>

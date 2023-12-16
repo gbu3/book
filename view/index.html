@@ -10,7 +10,18 @@
 <body>
     {% include 'header.html' %}
     <div class="content-wrapper">
-        <h1>BŪK</h1>
+        <h1>būk</h1>
+        <form action="/search/users" method="get">
+            <button type="submit" id="userSearch">Search Users</button>
+        </form>
+        <br />
+        <form action="/search/books" method="get">
+            <button type="submit" id="userSearch">Search Books</button>
+        </form>
+        <br />
+        <form action="/search/authors" method="get">
+            <button type="submit" id="userSearch">Search Authors</button>
+        </form>
     </div>
 
     <br />

@@ -1,9 +1,11 @@
 from sys import argv, stderr, exit
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, or_
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import sessionmaker
-from model.database import Base, User, Review, List, DB_URL
+from model.database import Base, User, Review, List, user_follower_association, DB_URL
 from model.reviews import user_review_to_dict
+from model.lists import user_list_to_dict
+import re
 
 engine = create_engine(DB_URL)
 
@@ -21,7 +23,7 @@ def _user_to_dict(user):
         "email": user.email,
         "phone": user.phone,
         # "metadata_info": user.metadata_info,
-        # "lists": [(lst.list_id, lst.title) for lst in user.lists], #TODO: CHANGE
+        "lists": [user_list_to_dict(lst) for lst in user.lists[:5]],
         "reviews": [user_review_to_dict(review) for review in user.reviews[:5]],
         "following": [follower_to_dict(u) for u in user.following],
         "followers": [follower_to_dict(u) for u in user.followers]
@@ -39,10 +41,36 @@ def follower_to_dict(user):
         "username": user.username
     }
 
-def search_users(user_id, username, full_name, email, limit):
+def get_users(user_id=None, username=None, full_name=None, email=None, limit=100):
     """
     search users by id, username, full_name, or email
     """
+    if all(arg is None for arg in [user_id, username, full_name, email]):
+        return None
+    
+    try:
+        if user_id:
+            print(user_id)
+            user_id = int(user_id)
+        if username:
+            print(username)
+            if type(username) is not str:
+                print("incorrect type for username")
+                return None
+        if full_name:
+            print(full_name)
+            if type(full_name) is not str:
+                print("incorrect type for full name")
+                return None
+        if email:
+            print(email)
+            if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+                print("incorrect format for email")
+                return None
+    except ValueError:
+        print("incorrect type for search parameters")
+        return None
+    
     try:
         Session = sessionmaker(bind=engine)
         session = Session()
@@ -54,9 +82,9 @@ def search_users(user_id, username, full_name, email, limit):
             query = query.filter(User.user_id == user_id)
         else:
             if username:
-                query = query.filter(User.username == username)
+                query = query.filter(User.username.ilike(f'%{username}%'))
             if full_name:
-                query = query.filter(User.full_name == full_name)
+                query = query.filter(User.full_name.ilike(f'%{full_name}%'))
             if email:
                 query = query.filter(User.email == email)
 
@@ -65,8 +93,6 @@ def search_users(user_id, username, full_name, email, limit):
         if not search_results:
             return None
 
-        # TODO: will likely want to add stuff about the lists/reviews/etc later
-        # but I think those should go in separate functions
         users = [_user_to_dict(user) for user in search_results]
 
         session.close()
@@ -83,10 +109,45 @@ def search_users(user_id, username, full_name, email, limit):
     finally:
         session.close()
 
+def get_all_users(limit=100):
+    """
+    get all users. for testing purposes, not exposed.
+    default limit is 100
+    """
+    try:
+        Session = sessionmaker(bind=engine)
+        session = Session()
+
+        all_users = session.query(User).limit(limit).all()
+
+        if not all_users:
+            ret = None
+        else:
+            ret = [_user_to_dict(user) for user in all_users]
+
+        session.close()
+        return ret
+
+    except SQLAlchemyError as e:
+        session.rollback()
+        print(f"Database error: {e}")
+        return None
+    except Exception as ex:
+        print(f"Error: {ex}")
+        return None
+    finally:
+        session.close()
+
 def get_user_info(user_id):
     """
     get user information in a dict by user id
     """
+    try:
+        user_id = int(user_id)
+    except ValueError:
+        print("incorrect type for user id")
+        return None
+    
     try:
         Session = sessionmaker(bind=engine)
         session = Session()
@@ -112,6 +173,14 @@ def get_user_info(user_id):
         session.close()
 
 def get_user_by_email(email):
+    if email:
+        if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+            print("incorrect format for email")
+            return None
+    else:
+        print("no email provided")
+        return None
+    
     try:
         Session = sessionmaker(bind=engine)
         session = Session()
@@ -130,6 +199,14 @@ def get_user_by_email(email):
         session.close()
 
 def get_user_by_username(username):
+    if username:
+        if type(username) is not str:
+            print("incorrect type for username")
+            return None
+    else:
+        print("no username provided")
+        return None
+    
     try:
         Session = sessionmaker(bind=engine)
         session = Session()
@@ -153,6 +230,13 @@ def is_a_follower(user2, user1):
     given their user ids
     returns True or False
     """
+    try:
+        user2 = int(user2)
+        user1 = int(user1)
+    except ValueError:
+        print("incorrect type for users")
+        return None
+    
     try:
         Session = sessionmaker(bind=engine)
         session = Session()
@@ -184,6 +268,12 @@ def get_followers(user_id):
     the given user id.
     """
     try:
+        user_id = int(user_id)
+    except ValueError:
+        print("incorrect type for user id")
+        return None
+    
+    try:
         Session = sessionmaker(bind=engine)
         session = Session()
 
@@ -214,6 +304,12 @@ def get_following(user_id):
     """
     returns a list of user_id and usernames that the given user is following
     """
+    try:
+        user_id = int(user_id)
+    except ValueError:
+        print("incorrect type for user id")
+        return None
+    
     try:
         Session = sessionmaker(bind=engine)
         session = Session()
@@ -247,39 +343,62 @@ def create_user(username, full_name, email, phone, password):
     username, full name, and email
     password is from flask_login
     """
+    if username:
+        if type(username) is not str:
+            print("incorrect type for username")
+            return None
+    else: 
+        print("username not provided")
+        return None
+    if full_name:
+        if type(full_name) is not str:
+            print("incorrect type for full name")
+            return None
+    else: 
+        print("full name not provided")
+        return None
+    if email:
+        if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+            print("incorrect format for email")
+            return None
+    else: 
+        print("email not provided")
+        return None
+    try:
+        if phone:
+            phone = int(phone)
+        else: 
+            print("phone not provided")
+            return None
+    except ValueError:
+        print("incorrect type for phone")
+        return None
+    
     try:
         Session = sessionmaker(bind=engine)
         session = Session()
 
         # profile_picture = user_data['profile_picture'] NOT SURE HOW TO DO THIS
-
-        if not username:
-            print ("Need to enter a username to create a new user") 
-            return None
         
-        if not full_name:
-            print("Need to enter a full name to create a new user")
+        # check that the user doesn't already exist (by email)
+        user_w_email = session.query(User).filter_by(email=email).first()
+        if user_w_email:
+            print("A User with that email already exists. Please sign in or try again.")
             return None
 
-        if not email:
-            print ("Need to enter an email to create a new user")
-            return None
-        
-        if not phone:
-            print ("Need to enter a phone number to create a new user")
+        user_w_username = session.query(User).filter_by(username=username).first()
+        if user_w_username:
+            print("That username is taken. Please choose another one.")
             return None
 
         new_user = User(username=username, full_name=full_name, email=email, phone=phone)
-        print("here, new_user")
         new_user.set_password(password)
-        print("issue")
         session.add(new_user)
         session.commit()
-        created_user_id = new_user.user_id
 
-        print(f"User created with ID: {created_user_id}")
+        print(f"User created with ID: {new_user.user_id}")
 
-        return {"user_id": created_user_id, "user_name": username}
+        return _user_to_dict(new_user)
 
     except SQLAlchemyError as e:
         session.rollback()
@@ -293,16 +412,31 @@ def create_user(username, full_name, email, phone, password):
 
 def update_user_name(user_id, username):
     try:
+        user_id = int(user_id)
+    except ValueError:
+        print("incorrect type for user id")
+        return None
+    
+    if username:
+        if type(username) is not str:
+            print("incorrect type for username")
+            return None
+    else: 
+        print("username not provided")
+        return None
+    
+    try:
         Session = sessionmaker(bind=engine)
         session = Session()
+
+        user_id = int(user_id)
 
         user = session.query(User).filter(User.user_id == user_id).first()
         if user:
             user.username = username
             session.commit()
             print(f"User {user_id} username updated successfully.")
-            ret = {"user_id": user.user_id,
-                   "user_name": user.username}
+            ret = _user_to_dict(user)
         else:
             print(f"No user found with ID {user_id}")
             ret = None
@@ -321,6 +455,19 @@ def update_user_name(user_id, username):
 
 def update_full_name(user_id, full_name):
     try:
+        user_id = int(user_id)
+    except ValueError:
+        print("incorrect type for user id")
+        return None
+    
+    if full_name:
+        if type(full_name) is not str:
+            print("incorrect type for full_name")
+            return None
+    else: 
+        print("full_name not provided")
+        return None
+    try:
         Session = sessionmaker(bind=engine)
         session = Session()
 
@@ -329,8 +476,7 @@ def update_full_name(user_id, full_name):
             user.full_name = full_name
             session.commit()
             print(f"User {user_id} full name updated successfully.")
-            ret = {"user_id": user.user_id,
-                   "full_name": user.full_name}
+            ret = _user_to_dict(user)
         else:
             print(f"No user found with ID {user_id}")
             ret = None
@@ -349,6 +495,19 @@ def update_full_name(user_id, full_name):
 
 def update_user_email(user_id, email):
     try:
+        user_id = int(user_id)
+    except ValueError:
+        print("incorrect type for user id")
+        return None
+    
+    if email:
+        if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+            print("incorrect format for email")
+            return None
+    else: 
+        print("email not provided")
+        return None
+    try:
         Session = sessionmaker(bind=engine)
         session = Session()
 
@@ -357,7 +516,45 @@ def update_user_email(user_id, email):
             user.email = email
             session.commit()
             print(f"User {user_id} email updated successfully.")
-            ret = {"user_id": user.user_id, "user_email": user.email}
+            ret = _user_to_dict(user)
+        else:
+            print(f"No user found with ID {user_id}")
+            ret = None
+
+        return ret
+
+    except SQLAlchemyError as e:
+        session.rollback()
+        print(f"Database error: {e}")
+        return None
+    except Exception as ex:
+        print(f"Error: {ex}")
+        return None
+    finally:
+        session.close()
+
+def update_user_phone(user_id, phone):
+    try:
+        user_id = int(user_id)
+        if phone:
+            phone = int(phone)
+        else: 
+            print("phone not provided")
+            return None
+    except ValueError:
+        print("incorrect type for phone or user id")
+        return None
+    
+    try:
+        Session = sessionmaker(bind=engine)
+        session = Session()
+
+        user = session.query(User).filter(User.user_id == user_id).first()
+        if user:
+            user.phone = phone
+            session.commit()
+            print(f"User {user_id} phone updated successfully.")
+            ret = _user_to_dict(user)
         else:
             print(f"No user found with ID {user_id}")
             ret = None
@@ -378,6 +575,13 @@ def follow_user(user1, user2):
     """
     make user 1 follow user 2
     """
+    try:
+        user2 = int(user2)
+        user1 = int(user1)
+    except ValueError:
+        print("incorrect type for users")
+        return None
+    
     follower_id = user1
     user_id_to_follow = user2
 
@@ -410,6 +614,13 @@ def unfollow_user(user1, user2):
     """
     make user 1 unfollow user 2
     """
+    try:
+        user2 = int(user2)
+        user1 = int(user1)
+    except ValueError:
+        print("incorrect type for users")
+        return None
+    
     follower_id = user1
     user_id_to_unfollow = user2
 
@@ -447,8 +658,21 @@ def unfollow_user(user1, user2):
 
 def delete_user(user_id):
     try:
+        user_id = int(user_id)
+    except ValueError:
+        print("incorrect type for user id")
+        return None
+    
+    try:
         Session = sessionmaker(bind=engine)
         session = Session()
+
+        session.query(user_follower_association).filter(
+            or_(
+                user_follower_association.c.user == user_id,
+                user_follower_association.c.follower == user_id
+            )
+        ).delete(synchronize_session='fetch')
 
         user = session.query(User).filter(User.user_id == user_id).first()
         if user:

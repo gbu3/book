@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>BŪK</title>
+    <!-- link to style sheet -->
+    <link rel="stylesheet" href="/static/stylesheet.css" />
+</head>
+
+<body>
+    {% include 'header.html' %}
+    <div class="content-wrapper">
+        <h1>Create new list:</h1>
+        <form action="/lists" method="POST">
+            <div class="inputs">
+                <div>Title</div>
+                <input type="text" name="title" value="{{ title }}" maxlength="100" /><br /><br />
+                <div>Description (max {{ char_limit }} characters)</div>
+                <textarea name="description" id="description" oninput="updateCharCount()" maxlength="{{ char_limit }}">{{ summary }}</textarea><br />
+                <div id="charCount"></div><br />
+            </div>
+            <input type="hidden" name="char_limit" value="{{ char_limit }}" />
+            <input type="submit" value="Create" />
+        </form>
+
+    </div>
+    <br />
+    {% include 'footer.html' %}
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+<script>
+    function updateCharCount() {
+        var charCount = document.getElementById("summary").value.length;
+        var charLimit = document.querySelector("input[name='char_limit']").value;
+        var remainingChars = charLimit - charCount;
+        document.getElementById("charCount").innerText = remainingChars + " characters remaining";
+    }
+
+    window.onload = function() {
+        updateCharCount();
+    };
+</script>
+</body>
+
+</html>

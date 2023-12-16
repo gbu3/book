@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>BŪK</title>
+    <!-- link to style sheet -->
+    <link rel="stylesheet" href="/static/stylesheet.css" />
+</head>
+
+<body>
+    {% include 'header.html' %}
+    <div class="content-wrapper">
+        <h1>Search for a user:</h1>
+        <form action="/users/search" method="get">
+            <div class="inputs">
+                <div>User ID</div>
+                <input type="text" name="user_id" value="{{user_id}}" /> <br /><br />
+                <div>Username</div>
+                <input type="text" name="username" value="{{username}}" /> <br /><br />
+                <div>Full name</div>
+                <input type="text" name="full_name" value="{{full_name}}" />
+                <br /><br />
+                <div>Email</div>
+                <input type="text" name="email" value="{{email}}" /> <br /><br />
+                <div>Limit search results #</div>
+                <input type="text" name="limit" value="{{limit}}" /> <br /><br />
+            </div>
+            <input type="submit" value="Search" />
+        </form>
+
+        <br />
+        <br />
+        {% if valid_search_terms: %} 
+            <h2>Search Results:</h2>
+            {% if not results or results|length == 0: %}
+            <br />
+            {% else %}
+                {% for user in results %}
+                    <a href="/users/{{ user['user_id'] }}">{{ user['username'] }}</a><br />
+                    Lists: {{ user['lists']|length }}<br />
+                    Reviews: {{ user['reviews']|length }}<br />
+                    <br />
+                {% endfor %}
+            {% endif %}
+        {% else %}
+        <p>No search terms provided. Please enter some search terms.</p>
+        {% endif %}
+    </div>
+    {% include 'footer.html' %}
+</body>
+
+</html>

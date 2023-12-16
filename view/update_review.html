@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>BŪK</title>
+    <!-- link to style sheet -->
+    <link rel="stylesheet" href="/static/stylesheet.css" />
+</head>
+
+<body>
+    {% include 'header.html' %}
+    <div class="content-wrapper">
+        <h1>Edit review for {{ review['book_name'] }}:</h1>
+        <form action="/reviews/{{review['review_id']}}" method="POST">
+            <div class="inputs">
+                <div>Rating (1-10)</div>
+                <input type="number" name="rating" value="{{ rating }}" min="1" max="10" /><br /><br />
+                <div>Summary (max {{ char_limit }} characters)</div>
+                <textarea name="summary" id="summary" oninput="updateCharCount()" maxlength="{{ char_limit }}">{{ summary }}</textarea><br />
+                <div id="charCount"></div><br />
+            </div>
+            <input type="hidden" name="book_id" value="{{ review['book_id'] }}" />
+            <input type="hidden" name="char_limit" value="{{ char_limit }}" />
+            <input type="submit" value="Update" />
+        </form>
+
+        <br />
+        <form id="deleteReview" method="post">
+            <input type="hidden" name="review_id" value="{{ review['review_id'] }}" />
+            <input id="button" type="submit" value="Delete Review" />
+        </form>
+
+        <br />
+        <a href="/reviews/{{review['review_id']}}">Back to review</a>
+
+    </div>
+    <br />
+    {% include 'footer.html' %}
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <script>
+        function updateCharCount() {
+            var charCount = document.getElementById("summary").value.length;
+            var charLimit = document.querySelector("input[name='char_limit']").value;
+            var remainingChars = charLimit - charCount;
+            document.getElementById("charCount").innerText = remainingChars + " characters remaining";
+        }
+    
+        window.onload = function() {
+            updateCharCount();
+        };
+
+        $("#deleteReview").submit(function (event) {
+            event.preventDefault();
+            var formData = $(this).serialize();
+            var reviewId = $("input[name='review_id']").val();
+            $.ajax({
+                url: '/reviews/' + reviewId,
+                type: 'DELETE',
+                data: formData,
+                success: function (response) {
+                    alert(response.message);
+                    window.location.href = '/users/profile';
+                },
+                error: function (xhr, status, error) {
+                    alert("Error deleting review: " + xhr.responseText);
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

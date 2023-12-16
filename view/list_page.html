@@ -1,0 +1,83 @@
+<!-- {"username": user.username, "email": user.email, "phone": user.phone} -->
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>BŪK</title>
+    <link rel="stylesheet" href="/static/stylesheet.css" />
+</head>
+
+<body>
+    {% include 'header.html' %}
+    <div class="content-wrapper">
+        {% if lst == None: %}
+        <h1>List not found.</h1>
+
+        {% else %}
+        <h1>{{ lst['title'] }}</h1>
+
+        Created by <a href="/users/{{ lst['creator_id'] }}">{{ lst['creator_name'] }}</a>.
+        <br/>
+
+        {% if lst['description'] %}
+        Description: 
+        {{ lst['description'] }}
+        <br />
+        {% endif %}
+        <br />
+
+        {% if current_user.is_authenticated and current_user.user_id == lst['creator_id'] %}
+        <form action="{{ url_for('get_update_list_page', list_id=lst['list_id']) }}" method="get">
+            <button type="submit" id="updateReview">Edit this list</button>
+        </form>
+        {% endif %}
+
+        <h2>Books</h2>
+        {% if not lst['books'] and current_user.user_id == lst['creator_id'] %}
+        Begin your new list! Add books from individual book pages.<br />
+        {% else %}
+        {% for book in lst['books'] %}
+            <a href="/books/{{ book['edition_id'] }}">{{ book['title'] }}</a>
+            by {{ book['authors'] }}<br />
+            <br />
+        {% endfor %}
+        {% endif %}
+
+        {% if current_user.is_authenticated and current_user.user_id == lst['creator_id'] %}
+        <br />
+        <form id="deleteList" method="post">
+            <input type="hidden" name="list_id" value="{{ lst['list_id'] }}" />
+            <input id="button" type="submit" value="Delete List" />
+        </form>
+        {% endif %}
+
+        {% endif %}
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        "use strict";
+        $("#deleteList").submit(function (event) {
+            event.preventDefault();
+            var formData = $(this).serialize();
+            var listId = $("input[name='list_id']").val();
+            $.ajax({
+                url: '/lists/' + listId,
+                type: 'DELETE',
+                data: formData,
+                success: function (response) {
+                    alert(response.message);
+                    window.location.href = '/users/profile';
+                },
+                error: function (xhr, status, error) {
+                    alert("Error deleting list: " + xhr.responseText);
+                }
+            });
+        });
+    </script>
+
+    {% include 'footer.html' %}
+</body>
+
+</html>

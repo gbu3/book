@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>BŪK</title>
+    <!-- link to style sheet -->
+    <link rel="stylesheet" href="/static/stylesheet.css" />
+</head>
+
+<body>
+    {% include 'header.html' %}
+    <div class="content-wrapper">
+        <h1>Search for an author:</h1>
+        <form action="/authors/search" method="get">
+            <div class="inputs">
+                <div>Author ID</div>
+                <input type="text" name="author_id" value="{{author_id}}" /> <br /><br />
+                <div>Author name</div>
+                <input type="text" name="author_name" value="{{author_name}}" /><br /><br />
+                <div>Limit search results #</div>
+                <input type="text" name="limit" value="{{limit}}" /> <br /><br />
+            </div>
+            <input type="submit" value="Search" />
+        </form>
+
+        <br />
+        <br />
+        {% if valid_search_terms: %} 
+            <h2>Search Results:</h2>
+            {% if not results or results|length == 0: %}
+            <br />
+            {% else %}
+                {% for author in results %}
+                    <a href="/authors/{{ author['author_id'] }}">{{ author['name'] }}</a>
+                    <br />
+                    <br />
+                {% endfor %}
+            {% endif %}
+        {% else %}
+        <p>No search terms provided. Please enter some search terms.</p>
+        {% endif %}
+    </div>
+    <br />
+    {% include 'footer.html' %}
+</body>
+
+</html>

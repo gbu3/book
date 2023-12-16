@@ -1,5 +1,5 @@
 .topnav {
-    background-color: #a7b3b7;
+    background-color: #b49dc4ff;
     overflow: hidden;
     font-family: "Mulish", sans-serif;
     display: flex;
@@ -40,7 +40,7 @@
 }
 
 .topnav a:hover {
-    background-color: #393f48;
+    background-color: #a47cbfff;
     color: white;
 }
 
@@ -69,6 +69,7 @@
   
   .content-wrapper {
     padding: 20px;
+    word-wrap: break-word;
     /* Adjust as needed */
     /* Other styles like max-width can be applied for better control */
   }

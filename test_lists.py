@@ -1,10 +1,10 @@
 import model.lists as lists
 
-user_id = 1 # grace
+# user_id = 1 # grace
 sanshiro = 'OL33968511M'
 kundera = 'OL3187189M'
 
-def test_create_list(title, description):
+def test_create_list(title, description, user_id):
     print("test_create_list")
     lst = lists.create_list(user_id=user_id, title=title, description=description)
     print(lst)
@@ -65,6 +65,20 @@ def test_get_lists_book_user(book_id):
         print(r)
     print()
 
+def test_get_all_lists():
+    print("ALL LISTS:")
+    all_lists = lists.get_all_lists()
+    for lst in all_lists:
+        print(lst)
+    print()
+
+def test_get_list_info(list_id):
+    print("test_get_list_info")
+    lst = lists.get_list_info(list_id)
+    print(lst)
+    print()
+
+
 def test_delete_list(list_id):
     print("test_delete_list")
     lst = lists.delete_list(list_id)
@@ -73,7 +87,8 @@ def test_delete_list(list_id):
 
 
 if __name__ == '__main__':
-    # test_create_list(title="favorites", description="the best books i've read this year")
+    # test_create_list(title="juliet's list", description="test", user_id=3)
+    test_create_list(title="to_read", description="winter break recs", user_id=1)
     # test_update_title(1, "to read")
     # test_update_description(1, "want to read these over winter break")
 
@@ -90,9 +105,12 @@ if __name__ == '__main__':
     # test_add_book(1, sanshiro)
     # test_get_lists_book(sanshiro)
 
-    test_get_lists_book_user(sanshiro)
+    # test_get_lists_book_user(sanshiro)
 
     # test_remove_book(1, sanshiro)
 
-    # test_delete_list(1)
+    # test_get_all_lists()
+    test_get_list_info(5)
+
+    # test_delete_list(3)
     # test_get_lists_user()

@@ -1,0 +1,131 @@
+<!-- {"username": user.username, "email": user.email, "phone": user.phone} -->
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>BŪK</title>
+    <link rel="stylesheet" href="/static/stylesheet.css" />
+</head>
+
+<body>
+    {% include 'header.html' %}
+    <div class="content-wrapper">
+        {% if book == None: %}
+        <h1>Book not found.</h1>
+
+        {% else %}
+        <h1>{{book['title']}}</h1>
+        By 
+        {% for author in book['authors'] %}
+        <a href="/authors/{{ author[1] }}">{{ author[0] }}</a>{% if not loop.last %}, {% endif %}
+        {% endfor %}
+        <br />
+        <br />
+
+        {% if book['publish_date'] %}
+        Published: {{ book['publish_date'] }}{% if book['publisher']|length != 0 %} by 
+        {% for pub in book['publisher'] %}
+            {{ pub }}{% if not loop.last %}, {% endif %}
+        {% endfor %}
+        {% endif %}
+        {% if book['publication_place']|length != 0 %} in 
+        {% for place in book['publication_place'] %}
+            {{ place }}{% if not loop.last %}, {% endif %}
+        {% endfor %}
+        {% endif %}
+        <br />
+        <br />
+        {% endif %}
+
+        {% if book['edition_name'] %}
+        {{ book['edition_name'] }}{% if volume_number %}: Vol. {{ book['volume_number'] }}{%endif%}
+        <br />
+        <br />
+        {% endif %}
+
+        {%if book['description'] %}
+        Description: 
+        {{ book['description'] }}
+        <br />
+        <br />
+        {% endif %}
+
+        {%if book['genres']|length != 0 %}
+        Genres: 
+        {% for genre in book['genres'] %}
+            {{ genre }}{% if not loop.last %}, {% endif %}
+        {% endfor %}
+        <br />
+        <br />
+        {% endif %}
+
+        {%if book['subjects']|length != 0 %}
+        Subjects: 
+        {% for subj in book['subjects'] %}
+            {{ subj }}{% if not loop.last %}, {% endif %}
+        {% endfor %}
+        <br />
+        <br />
+        {% endif %}
+
+        Average rating: {{ book['average_rating'] }}<br/>
+        <br />
+
+        <!-- add to list -->
+        <div class="add-to-list">
+            {% if user_lists|length > 0 %}
+                <form action="/lists/add/{{ book['edition_id'] }}" method="post">
+                    <label for="listSelect">Add to list:</label>
+                    <select name="list_id" id="listSelect">
+                        {% for lst in user_lists %}
+                            <option value="{{ lst['list_id'] }}">{{ lst['title'] }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit">Add to List</button>
+                </form>
+            {% else %}
+                Create a list to add this book.<br />
+                <form action="/lists/create" method="get">
+                    <button type="submit" id="createList">Create a new list</button>
+                </form>
+            {% endif %}
+        </div>
+        <!-- <br /> -->
+
+        <div class="reviews">
+            <h2>Reviews</h2>
+            {% if curr_review_id and curr_review_id != 0 %}
+                <form action="/reviews/{{ curr_review_id }}" method="get">
+                    <button type="submit" id="getReview">See my review</button>
+                </form>
+                <br />
+            {% else %}
+                <form action="/reviews/create" method="get">
+                    <input type="hidden" name="book_id" value="{{book['edition_id']}}" />
+                    <button type="submit" id="reviewBook">Review this book</button>
+                </form>
+                <br />
+            {% endif %}
+
+            {% if not book['reviews'] %}
+                No reviews yet.
+            {% else %}
+                {% for review in book['reviews'] %}
+                    By: <a href="/users/{{ review['reviewer_id'] }}">{{ review['reviewer_username'] }}</a>
+                    <br />
+                    Rated: {{ review['rating'] }}/10 <br />
+                    Review: {{ review['summary'] }} <br/>
+                    <a href="/reviews/{{review['review_id']}}">See this review</a>
+                    <br/><br/>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        {% endif %}
+    </div>
+
+    {% include 'footer.html' %}
+</body>
+
+</html>

@@ -1,16 +1,15 @@
 from sys import argv, stderr, exit
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, and_
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import sessionmaker
 from model.database import DB_URL, Base, User, Review, List, Editions
 from model.books import get_edition_title_cover_authors
-from model.users import follower_to_dict
 
 engine = create_engine(DB_URL)
 
 DESCRIPTION_CHARACTER_LENGTH = 500
 
-def _list_to_dict(list):
+def list_to_dict(list):
     """
     convert a List to a dictionary to return
     detailed information for a list page
@@ -26,6 +25,29 @@ def _list_to_dict(list):
         "title": list.title,
         "books": [get_edition_title_cover_authors(edition.id) for edition in list.books],
         "liked_by": [follower_to_dict(user) for user in list.liked_by]
+    }
+
+def user_list_to_dict(lst):
+    """
+    convert a List to a dict for display
+    on user page - more minimal
+    """
+    return {
+        "list_id": lst.list_id,
+        "title": lst.title,
+        "description": lst.description
+    }
+
+def follower_to_dict(user):
+    """
+    creates a very minimal dict for follower/following display
+    """
+    if not user:
+        return None
+    
+    return {
+        "user_id": user.user_id,
+        "username": user.username
     }
 
 def get_lists(user_id=None, book_id=None, list_id=None, limit=100):
@@ -62,17 +84,66 @@ def get_lists(user_id=None, book_id=None, list_id=None, limit=100):
             # if list_id is provided, ignore other filters (just need 1)
             query = query.filter(List.list_id == list_id)
         else:
+            conditions = []
             if user_id:
                 query = query.filter(List.creator_id == user_id)
             if book_id:
                 query = query.filter(List.books.any(id=book_id))
 
+            if conditions:
+                query = query.filter(and_(*conditions))
+
         # limit results
         results = query.limit(limit).all()
 
-        lists = [_list_to_dict(list_obj) for list_obj in results]
+        lists = [list_to_dict(list_obj) for list_obj in results]
         session.close()
         return lists
+    
+    except SQLAlchemyError as e:
+        session.rollback()
+        print(f"Database error: {e}")
+        return None
+    except Exception as ex:
+        print(f"Error: {ex}")
+        return None
+    finally:
+        session.close()
+
+def get_all_lists(limit=100):
+    """
+    gets all lists. for testing purposes, not exposed.
+    default limit is 100
+    """
+    try:
+        Session = sessionmaker(bind=engine)
+        session = Session()
+
+        all_lists = session.query(List).limit(limit).all()
+
+        return [list_to_dict(lst) for lst in all_lists]
+    
+    except SQLAlchemyError as e:
+        session.rollback()
+        print(f"Database error: {e}")
+        return None
+    except Exception as ex:
+        print(f"Error: {ex}")
+        return None
+    finally:
+        session.close()
+
+def get_list_info(list_id):
+    """
+    get an individual list by id.
+    """
+    try:
+        Session = sessionmaker(bind=engine)
+        session = Session()
+
+        lst = session.query(List).filter_by(list_id=list_id).first()
+
+        return list_to_dict(lst)
     
     except SQLAlchemyError as e:
         session.rollback()
@@ -132,7 +203,7 @@ def create_list(user_id, title=None, description=None):
 
         print(f"New list created: {new_list.list_id}")
 
-        return _list_to_dict(new_list)
+        return list_to_dict(new_list)
     
     except SQLAlchemyError as e:
         session.rollback()
@@ -144,7 +215,7 @@ def create_list(user_id, title=None, description=None):
     finally:
         session.close()
 
-def update_list_title(user_id, list_id, title):
+def update_list(user_id, list_id, title, description):
     try:
         user_id = int(user_id)
         list_id = int(list_id)
@@ -152,8 +223,8 @@ def update_list_title(user_id, list_id, title):
         print("incorrect type for user or list id")
         return None
     
-    if not title:
-        print(f"No title provided")
+    if not title and not description:
+        print(f"No title or description provided")
         return None
     
     try:
@@ -170,57 +241,16 @@ def update_list_title(user_id, list_id, title):
             print(f"user {user_id} does not have permission to modify this list")
             return None
         
-        list.title = title
+        if title:
+            list.title = title
+        if description:
+            list.description = description
 
         session.commit()
 
-        print(f"list {list_id} title successfully modified to {title}")
+        print(f"list {list_id} successfully updated")
 
-        return _list_to_dict(list)
-    
-    except SQLAlchemyError as e:
-        session.rollback()
-        print(f"Database error: {e}")
-        return None
-    except Exception as ex:
-        print(f"Error: {ex}")
-        return None
-    finally:
-        session.close()
-
-def update_list_description(user_id, list_id, description):
-    try:
-        user_id = int(user_id)
-        list_id = int(list_id)
-    except ValueError:
-        print("incorrect type for user or list id")
-        return None
-    
-    if not description:
-        print(f"No description provided")
-        return None
-    
-    try:
-        Session = sessionmaker(bind=engine)
-        session = Session()
-
-        list = session.query(List).filter(List.list_id==list_id).first()
-        if not list:
-            print(f"No list found with the id {list_id}")
-            return None
-
-        # check that user is correct
-        if user_id != list.creator_id:
-            print(f"user {user_id} does not have permission to modify this list")
-            return None
-        
-        list.description = description
-
-        session.commit()
-
-        print(f"list {list_id} description successfully modified to {description}")
-
-        return _list_to_dict(list)
+        return list_to_dict(list)
     
     except SQLAlchemyError as e:
         session.rollback()
@@ -271,7 +301,7 @@ def add_list_book(user_id, list_id, book_id):
 
         session.commit()
 
-        return _list_to_dict(list)
+        return list_to_dict(list)
     
     except SQLAlchemyError as e:
         session.rollback()
@@ -318,7 +348,7 @@ def remove_list_book(user_id, list_id, book_id):
 
         session.commit()
 
-        return _list_to_dict(list)
+        return list_to_dict(list)
     
     except SQLAlchemyError as e:
         session.rollback()

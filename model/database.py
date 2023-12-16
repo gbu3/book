@@ -30,9 +30,9 @@ class User(UserMixin, Base):
     metadata_info = Column(String)
     password_hash = Column(String)
 
-    lists = relationship('List', back_populates='creator')
-    reviews = relationship('Review', back_populates='reviewer')
-    liked_lists = relationship('List', secondary='likes', back_populates='liked_by')
+    lists = relationship('List', back_populates='creator', cascade="all, delete-orphan")
+    reviews = relationship('Review', back_populates='reviewer', cascade="all, delete-orphan")
+    liked_lists = relationship('List', secondary='likes', back_populates='liked_by', cascade="all, delete")
 
     # Define a one-to-many relationship for users following this user
     following = relationship(
@@ -40,7 +40,8 @@ class User(UserMixin, Base):
         secondary=user_follower_association,
         primaryjoin=user_id == user_follower_association.c.follower,
         secondaryjoin=user_id == user_follower_association.c.user,
-        back_populates='followers'
+        back_populates='followers',
+        cascade="all, delete"
     )
 
     followers = relationship(
@@ -48,7 +49,8 @@ class User(UserMixin, Base):
         secondary=user_follower_association,
         primaryjoin=user_id == user_follower_association.c.user,
         secondaryjoin=user_id == user_follower_association.c.follower,
-        back_populates='following'
+        back_populates='following',
+        cascade="all, delete"
     )
 
     def set_password(self, password):
@@ -115,7 +117,7 @@ class Editions(Base):
     number_of_pages = Column(Integer)
     pagination = Column(String)
     translation_of = Column(String)
-    dewey_decimal_class = Column(String)
+    dewey_decimal_class = Column(String) # MAY NEED TO NORMALIZE
     # lccn = Column(Integer) # need to convert from string
 
     # assoc tables

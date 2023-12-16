@@ -11,45 +11,91 @@
 <body>
     {% include 'header.html' %}
     <div class="content-wrapper">
-        {% if name == None: %}
+        {% if user == None: %}
         <h1>User not found.</h1>
 
         {% else %}
-        <h1>{{full_name}}</h1>
-        Username: {{username}}<br />
-        Full name: {{full_name}}<br />
-        Email: {{email}}<br />
-        Phone: {{phone}}<br />
-        Reviews: {{reviews}}<br />
-        <div class="following-list">
-            Following: 
-            {% if not following %}
-            Not following any users.
+        <h1>{{user['username']}}</h1>
+        {{user['full_name']}}<br />
+        <br />
+
+        {% if current_user.is_authenticated and current_user.user_id == user['user_id'] %}
+            <form action="{{ url_for('get_user_settings', user_id=user['user_id']) }}" method="post">
+                <button type="submit" id="userSettings">User settings</button>
+            </form>
+        {% endif %}
+
+        {% if current_user.user_id != user['user_id'] %}
+            {% if is_follower %}
+                <form action="/users/{{ user['user_id'] }}/unfollow" method="post">
+                    <button type="submit" id="followUser">Unfollow</button>
+                </form>
             {% else %}
-            {% for user in following %}
-                <a href="users?user_id={{ user['user_id'] }}">{{ user['username'] }}</a>{% if not loop.last %}, {% endif %}
-            {% endfor %}
+                <form action="/users/{{ user['user_id'] }}/follow" method="post">
+                    <button type="submit" id="followUser">Follow</button>
+                </form>
+            {% endif %}
+        {% endif %}
+        <br />
+        <div class="following-list">
+            {% if not user['following'] %}
+            Following: Not following any users.
+            {% else %}
+            Following ({{ user['following']|length }}): 
+                {% for user in user['following'] %}
+                    <a href="/users/{{ user['user_id'] }}">{{ user['username'] }}</a>{% if not loop.last %}, {% endif %}
+                {% endfor %}
             {% endif %}
         </div>
         <div class="follower-list">
-            Followers: 
-            {% if not following %}
-            Not followed by any users.
+            {% if not user['followers'] %}
+            Followers: Not followed by any users.
             {% else %}
-            {% for user in followers %}
-                <a href="users?user_id={{ user['user_id'] }}">{{ user['username'] }}</a>{% if not loop.last %}, {% endif %}
-            {% endfor %}
+            Followers ({{ user['followers']|length }}):
+                {% for user in user['followers'] %}
+                    <a href="/users/{{ user['user_id'] }}">{{ user['username'] }}</a>{% if not loop.last %}, {% endif %}
+                {% endfor %}
+            {% endif %}
+        </div>
+        <br />
+        <div class="lists">
+            <h2>Lists ({{ user['lists']|length }})</h2>
+            {% if not user['lists'] %}
+                No lists yet.
+                <br/><br/>
+            {% else %}
+                {% for lst in user['lists'] %}
+                    <a href="/lists/{{ lst['list_id'] }}">
+                        {{ lst['title'] }}
+                    </a>
+                    <br/>
+                    {{ lst['description'] }}
+                    <br/><br/>
+                {% endfor %}
+            {% endif %}
+            <!-- <br /> -->
+            {% if current_user.is_authenticated and current_user.user_id == user['user_id'] %}
+            <form action="/lists/create" method="get">
+                <button type="submit" id="createList">Create a new list</button>
+            </form>
+            {% endif %}
+        </div>
+        <div class="reviews">
+            <h2>Reviews ({{ user['reviews']|length }})</h2>
+            {% if not user['reviews'] %}
+                No reviews yet.
+            {% else %}
+                {% for review in user['reviews'] %}
+                    <a href="/books/{{review['book_id']}}">{{review['book_title']}}</a>, 
+                    by {{ review['author_names']}} <br />
+                    Rated: {{ review['rating'] }}/10 <br />
+                    Review: {{ review['summary'] }} <br/>
+                    <a href="/reviews/{{review['review_id']}}">See this review</a><br/>
+                    <br/>
+                {% endfor %}
             {% endif %}
         </div>
 
-        {% endif %}
-        <br />
-        {% if current_user.is_authenticated and current_user.user_id == user_id %}
-            <br />
-            <a href="/users/settings?user_id={{user_id}}&username={{username}}&full_name={{full_name}}">
-            User settings
-            </a>
-            <br />
         {% endif %}
     </div>
 

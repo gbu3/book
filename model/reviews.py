@@ -1,7 +1,7 @@
 # reviews need to have global id numbers, irrespective of the user
 
 from sys import argv, stderr, exit
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, and_
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import sessionmaker
 from model.database import DB_URL, Base, User, Review, List, Editions, Authors
@@ -9,9 +9,9 @@ from model.books import get_edition_title_cover_authors
 
 engine = create_engine(DB_URL)
 
-REVIEW_CHARACTER_LENGTH = 500
+REVIEW_CHARACTER_LENGTH = 300
 
-def _review_to_dict(review):
+def review_to_dict(review):
     """
     convert a Review to a dictionary to return
     detailed information for a review page
@@ -22,7 +22,7 @@ def _review_to_dict(review):
     return {
         "review_id": review.review_id,
         "reviewer_id": review.reviewer_id,
-        "reviewer_username": review.reviewer.username,
+        "reviewer_username": review.reviewer.username if review.reviewer else None,
         "book_id": review.book_id,
         "book_name": review.book_title,
         "book_cover": review.book_cover,
@@ -65,9 +65,6 @@ def get_reviews(user_id=None, book_id=None, review_id=None, limit=100):
             if type(book_id) is not str:
                 print("incorrect type for book id")
                 return None
-        else:
-            print("no book id provided")
-            return None
     except ValueError:
         print("incorrect type for search parameters")
         return None
@@ -83,15 +80,70 @@ def get_reviews(user_id=None, book_id=None, review_id=None, limit=100):
             # if review_id is provided, ignore other filters (just need 1)
             query = query.filter(Review.review_id == review_id)
         else:
+            conditions = []
             if user_id:
                 query = query.filter(Review.reviewer_id == user_id)
             if book_id:
                 query = query.filter(Review.book_id == book_id)
+            
+            if conditions:
+                query = query.filter(and_(*conditions))
 
         # limit results
         reviews = query.limit(limit).all()
 
-        return [_review_to_dict(review) for review in reviews]
+        return [review_to_dict(review) for review in reviews]
+    
+    except SQLAlchemyError as e:
+        session.rollback()
+        print(f"Database error: {e}")
+        return None
+    except Exception as ex:
+        print(f"Error: {ex}")
+        return None
+    finally:
+        session.close()
+
+def get_all_reviews(limit=100):
+    """
+    gets all reviews. for testing purposes, not exposed.
+    default limit is 100
+    """
+    try:
+        Session = sessionmaker(bind=engine)
+        session = Session()
+
+        all_reviews = session.query(Review).limit(limit).all()
+
+        return [review_to_dict(review) for review in all_reviews]
+    
+    except SQLAlchemyError as e:
+        session.rollback()
+        print(f"Database error: {e}")
+        return None
+    except Exception as ex:
+        print(f"Error: {ex}")
+        return None
+    finally:
+        session.close()
+
+def get_review_info(review_id):
+    """
+    get an individual review by id.
+    """
+    try:
+        review_id = int(review_id)
+    except ValueError:
+        print("incorrect type for review id")
+        return None
+
+    try:
+        Session = sessionmaker(bind=engine)
+        session = Session()
+
+        review = session.query(Review).filter_by(review_id=review_id).first()
+
+        return review_to_dict(review)
     
     except SQLAlchemyError as e:
         session.rollback()
@@ -172,7 +224,7 @@ def create_review(book_id, user_id, summary, rating, note=None):
 
         print(f"New review created: {new_review.review_id}")
 
-        return _review_to_dict(new_review)
+        return review_to_dict(new_review)
     
     except SQLAlchemyError as e:
         session.rollback()
@@ -184,7 +236,7 @@ def create_review(book_id, user_id, summary, rating, note=None):
     finally:
         session.close()
 
-def update_review_summary(review_id, user_id, summary):
+def update_review(review_id, user_id, summary=None, rating=None):
     try:
         user_id = int(user_id)
         review_id = int(review_id)
@@ -192,9 +244,19 @@ def update_review_summary(review_id, user_id, summary):
         print("incorrect type for user or review id")
         return None
     
-    if not summary:
-        print("summary not provided")
+    if not summary and not rating:
+        print("nothing to update")
         return None
+    
+    if rating:
+        try:
+            rating = int(rating)
+            if not 0 <= rating <= 10:
+                print("rating must be an integer 1 to 10.")
+                return None
+        except ValueError:
+            print("rating must be an integer 1 to 10.")
+            return None
     
     try:
         Session = sessionmaker(bind=engine)
@@ -211,6 +273,9 @@ def update_review_summary(review_id, user_id, summary):
         if not review:
             print(f"Review {review_id} does not exist.")
             return None
+        
+        if rating:
+            review.rating = rating
 
         if summary:
             if len(summary) > REVIEW_CHARACTER_LENGTH:
@@ -220,64 +285,9 @@ def update_review_summary(review_id, user_id, summary):
         
         session.commit()
 
-        print(f"Review summary updated: {review.review_id}")
+        print(f"Review updated: {review.review_id}")
 
-        return _review_to_dict(review)
-    
-    except SQLAlchemyError as e:
-        session.rollback()
-        print(f"Database error: {e}")
-        return None
-    except Exception as ex:
-        print(f"Error: {ex}")
-        return None
-    finally:
-        session.close()
-
-def update_review_rating(review_id, user_id, rating):
-    try:
-        user_id = int(user_id)
-        review_id = int(review_id)
-    except ValueError:
-        print("incorrect type for user or review id")
-        return None
-    
-    if not rating:
-        print("rating not provided")
-        return None
-    
-    try:
-        rating = int(rating)
-        if not 0 <= rating <= 10:
-            print("rating must be an integer 1 to 10.")
-            return None
-    except ValueError:
-        print("rating must be an integer 1 to 10.")
-        return None
-    
-    try:
-        Session = sessionmaker(bind=engine)
-        session = Session()
-
-        # check that the user exists
-        user = session.query(User).filter(User.user_id==user_id).first()
-        if not user:
-            print("update review failed: incorrect user id")
-            return None
-
-        review = session.query(Review).filter(Review.review_id==review_id).first()
-
-        if not review:
-            print(f"Review {review_id} does not exist.")
-            return None
-
-        review.rating = rating
-        
-        session.commit()
-
-        print(f"Review rating updated: {review.review_id}")
-
-        return _review_to_dict(review)
+        return review_to_dict(review)
     
     except SQLAlchemyError as e:
         session.rollback()

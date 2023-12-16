@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>BŪK</title>
+    <link rel="stylesheet" href="/static/stylesheet.css" />
+</head>
+
+<body>
+    {% include 'header.html' %}
+    <div class="content-wrapper">
+        {% if not review: %}
+        <h1>Review not found.</h1>
+
+        {% else %}
+        <h1>
+            Review of <a href="/books/{{ review['book_id'] }}">{{review['book_name']}}</a>
+            {% if review['book_authors'] %}
+                by {{ review['book_authors'] }}
+            {% endif %}
+        </h1>
+        Reviewed by <a href="/users/{{ review['reviewer_id'] }}">{{review['reviewer_username']}}</a><br />
+        <br />
+
+        {% if current_user.is_authenticated and current_user.user_id == review['reviewer_id'] %}
+        <form action="{{ url_for('get_update_review_page', review_id=review['review_id']) }}" method="get">
+            <button type="submit" id="updateReview">Edit this review</button>
+        </form>
+        <br />
+        {% endif %}
+
+        Rating: {{ review['rating'] }}/10
+        <br /><br />
+
+        {% if review['summary'] %}
+            Summary: {{ review['summary'] }}
+        {% endif %}
+        <br />
+
+        {% if current_user.is_authenticated and current_user.user_id == review['reviewer_id'] %}
+        <br />
+        <form id="deleteReview" method="post">
+            <input type="hidden" name="review_id" value="{{ review['review_id'] }}" />
+            <input id="button" type="submit" value="Delete Review" />
+        </form>
+        {% endif %}
+
+        {% endif %}
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        "use strict";
+        $("#deleteReview").submit(function (event) {
+            event.preventDefault();
+            var formData = $(this).serialize();
+            var reviewId = $("input[name='review_id']").val();
+            $.ajax({
+                url: '/reviews/' + reviewId,
+                type: 'DELETE',
+                data: formData,
+                success: function (response) {
+                    alert(response.message);
+                    window.location.href = '/users/profile';
+                },
+                error: function (xhr, status, error) {
+                    alert("Error deleting review: " + xhr.responseText);
+                }
+            });
+        });
+    </script>
+    {% include 'footer.html' %}
+</body>
+
+</html>

@@ -67,10 +67,10 @@ FUNCTIONS
         returns [simple_editions]
     
     ** get edition details **
-    get_edition(edition):
+    get_edition_info(edition):
         returns edition_details
     get_edition_title_cover_authors(edition_id)
-        returns {
+        returns edition_title_cover_authors_dict = {
             "edition_id": edition.id,
             "title": string,
             "cover": integer,
@@ -80,8 +80,32 @@ FUNCTIONS
     ** authors: search author and get **
     search_author(author_name, author_id, limit):
         returns author_details
-    get_author(author_id):
+    get_author_info(author_id):
         returns author_details
+
+    ** get reviews and lists by edition_id **
+    get_reviews(edition_id, limit)
+        returns review_dict {
+            "review_id": integer, review.review_id,
+            "reviewer_id": integer, user.user_id,
+            "reviewer_username": string, user.username,
+            "book_id": string,
+            "book_name": string,
+            "book_cover": integer,
+            "book_authors": string,
+            "summary": string,
+            "rating": integer 1 to 10
+        }
+    get_lists(edition_id, limit)
+        returns list_dict {
+            "list_id": integer, list.list_id,
+            "creator_id": integer, user.user_id,
+            "creator_name": string, user.username,
+            "description": string,
+            "title": string,
+            "books": list of edition_title_cover_authors_dicts,
+            "liked_by": list of user.follower_dicts
+        }
     
 """
 
@@ -133,7 +157,7 @@ def search_editions(edition_id=None, work_id=None, author_name=None,
             query = query.filter(Editions.title.ilike(f'%{title}%'))
 
         if publish_date:
-            query = query.filter(Editions.publish_date == publish_date)
+            query = query.filter(Editions.publish_date.ilike(f'%{publish_date}%'))
 
         if publisher_name:
             PublisherAlias = aliased(Publishers)
@@ -297,7 +321,7 @@ def search_by_work(work_id, limit=100):
     finally:
         session.close()
 
-def get_edition(edition_id):
+def get_edition_info(edition_id):
     """
     get book details by an edition_id
     returns an edition_details dict
@@ -411,7 +435,7 @@ def search_author(author_name=None, author_id=None, limit=100):
     finally:
         session.close()
 
-def get_author(author_id):
+def get_author_info(author_id):
     """
     get individual author details by id
     returns an author_details dict
@@ -500,14 +524,17 @@ def _edition_details_dict(edition):
                         .filter(Editions_Covers.edition_id == edition.id)\
                         .first()
         
-        reviews = session.query(Review.summary, Review.note)\
-                         .filter(Review.book_id == edition.id)\
-                         .limit(REVIEW_LIMIT)\
-                         .all()
+        reviews_results = session.query(Review)\
+                                .filter(Review.book_id == edition.id)\
+                                .limit(REVIEW_LIMIT)\
+                                .all()
 
         average_rating = session.query(func.avg(Review.rating))\
                                 .filter(Review.book_id == edition.id)\
                                 .scalar()
+        
+        if average_rating is not None:
+            average_rating = float(f"{average_rating:.2f}")
         
         return {
             'edition_id': edition.id,
@@ -522,7 +549,7 @@ def _edition_details_dict(edition):
             'genres': [item[0] for item in genres],
             'subjects': [item[0] for item in subjects],
             'edition_cover': cover[0] if cover else None,
-            'reviews': reviews,
+            'reviews': [_review_to_dict_books(review) for review in reviews_results],
             'average_rating': average_rating
         }
 
@@ -535,6 +562,22 @@ def _edition_details_dict(edition):
         return None
     finally:
         session.close()
+
+def _review_to_dict_books(review):
+    """
+    convert a Review to a dictionary to return
+    minimal information for a book page
+    """
+    if not review:
+        return None
+    
+    return {
+        "review_id": review.review_id,
+        "reviewer_id": review.reviewer_id,
+        "reviewer_username": review.reviewer.username if review.reviewer else None,
+        "summary": review.summary,
+        "rating": review.rating
+    }
 
 def _author_to_dict(author):
     """
@@ -576,3 +619,67 @@ def _author_to_dict(author):
         return None
     finally:
         session.close()
+
+##### GET REVIEWS OR LISTS FOR A PARTICULAR BOOK #####
+
+# def get_reviews(edition_id, limit=100):
+#     """
+#     get reviews by edition id. default result limit is 100
+#     """
+#     if not edition_id:
+#         print("book id not provided")
+#         return None
+#     if type(edition_id) is not str:
+#         print("incorrect type for book id")
+#         return None
+
+#     try:
+#         Session = sessionmaker(bind=engine)
+#         session = Session()
+
+#         reviews = session.query(Review).filter(Review.book_id==edition_id)\
+#                                         .limit(limit)\
+#                                         .all()
+
+#         return [review_to_dict(review) for review in reviews]
+    
+#     except SQLAlchemyError as e:
+#         session.rollback()
+#         print(f"Database error: {e}")
+#         return None
+#     except Exception as ex:
+#         print(f"Error: {ex}")
+#         return None
+#     finally:
+#         session.close()
+
+# def get_lists(edition_id, limit=100):
+#     """
+#     get lists by edition id. default result limit is 100
+#     """
+#     if not edition_id:
+#         print("book id not provided")
+#         return None
+#     if type(edition_id) is not str:
+#         print("incorrect type for book id")
+#         return None
+
+#     try:
+#         Session = sessionmaker(bind=engine)
+#         session = Session()
+
+#         lists = session.query(List).filter(List.books.any(id=edition_id))\
+#                                     .limit(limit)\
+#                                     .all()
+
+#         return [list_to_dict(lst) for lst in lists]
+    
+#     except SQLAlchemyError as e:
+#         session.rollback()
+#         print(f"Database error: {e}")
+#         return None
+#     except Exception as ex:
+#         print(f"Error: {ex}")
+#         return None
+#     finally:
+#         session.close()

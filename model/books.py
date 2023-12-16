@@ -460,15 +460,6 @@ def get_author_info(author_id):
     finally:
         session.close()
 
-# def create_book(cover_image, rating, book_data):
-#     pass
-
-# def update_book(book_id, cover_image, rating, book_data):
-#     pass
-
-# def delete_book(book_id):
-#     pass
-
 def _edition_to_dict(edition):
     """
     helper function for creating a simple_edition dict
@@ -619,67 +610,3 @@ def _author_to_dict(author):
         return None
     finally:
         session.close()
-
-##### GET REVIEWS OR LISTS FOR A PARTICULAR BOOK #####
-
-# def get_reviews(edition_id, limit=100):
-#     """
-#     get reviews by edition id. default result limit is 100
-#     """
-#     if not edition_id:
-#         print("book id not provided")
-#         return None
-#     if type(edition_id) is not str:
-#         print("incorrect type for book id")
-#         return None
-
-#     try:
-#         Session = sessionmaker(bind=engine)
-#         session = Session()
-
-#         reviews = session.query(Review).filter(Review.book_id==edition_id)\
-#                                         .limit(limit)\
-#                                         .all()
-
-#         return [review_to_dict(review) for review in reviews]
-    
-#     except SQLAlchemyError as e:
-#         session.rollback()
-#         print(f"Database error: {e}")
-#         return None
-#     except Exception as ex:
-#         print(f"Error: {ex}")
-#         return None
-#     finally:
-#         session.close()
-
-# def get_lists(edition_id, limit=100):
-#     """
-#     get lists by edition id. default result limit is 100
-#     """
-#     if not edition_id:
-#         print("book id not provided")
-#         return None
-#     if type(edition_id) is not str:
-#         print("incorrect type for book id")
-#         return None
-
-#     try:
-#         Session = sessionmaker(bind=engine)
-#         session = Session()
-
-#         lists = session.query(List).filter(List.books.any(id=edition_id))\
-#                                     .limit(limit)\
-#                                     .all()
-
-#         return [list_to_dict(lst) for lst in lists]
-    
-#     except SQLAlchemyError as e:
-#         session.rollback()
-#         print(f"Database error: {e}")
-#         return None
-#     except Exception as ex:
-#         print(f"Error: {ex}")
-#         return None
-#     finally:
-#         session.close()

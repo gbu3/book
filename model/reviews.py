@@ -80,14 +80,10 @@ def get_reviews(user_id=None, book_id=None, review_id=None, limit=100):
             # if review_id is provided, ignore other filters (just need 1)
             query = query.filter(Review.review_id == review_id)
         else:
-            conditions = []
             if user_id:
                 query = query.filter(Review.reviewer_id == user_id)
             if book_id:
                 query = query.filter(Review.book_id == book_id)
-            
-            if conditions:
-                query = query.filter(and_(*conditions))
 
         # limit results
         reviews = query.limit(limit).all()

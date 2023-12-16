@@ -1,5 +1,5 @@
 from sys import argv, stderr, exit
-from sqlalchemy import create_engine, or_
+from sqlalchemy import create_engine, or_, and_
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import sessionmaker
 from model.database import Base, User, Review, List, user_follower_association, DB_URL
@@ -288,8 +288,6 @@ def get_followers(user_id):
 
         return followers
 
-        # print(f"{user.username} followers: {[follower.username for follower in user.followers]}, following: {[followee.username for followee in user.following]}")            
-
     except SQLAlchemyError as e:
         session.rollback()
         print(f"Database error: {e}")
@@ -324,8 +322,6 @@ def get_following(user_id):
             following.append(follower_to_dict(usr))
 
         return following
-
-        # print(f"{user.username} followers: {[follower.username for follower in user.followers]}, following: {[followee.username for followee in user.following]}")            
 
     except SQLAlchemyError as e:
         session.rollback()

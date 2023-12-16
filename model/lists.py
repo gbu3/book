@@ -50,21 +50,29 @@ def follower_to_dict(user):
         "username": user.username
     }
 
-def get_lists(user_id=None, book_id=None, list_id=None, limit=100):
+def get_lists(user_name=None, list_name=None, user_id=None, list_id=None, book_id=None, limit=100):
     """
     get a list by its list_id, or
     search lists for a particular book and/or user
     (filters will be layered)
     default limit on results is 100
     """
-    if all(arg is None for arg in [user_id, book_id, list_id]):
+    if all(arg is None for arg in [user_name, list_name, user_id, list_id, book_id]):
         return None
     
     try:
         if user_id:
             user_id = int(user_id)
+        if user_name:
+            if type(user_name) is not str:
+                print("incorrect type for user_name")
+                return None
         if list_id:
             list_id = int(list_id)
+        if list_name:
+            if type(list_name) is not str:
+                print("incorrect type for list_name")
+                return None
         if book_id:
             if type(book_id) is not str:
                 print("incorrect type for book id")
@@ -80,18 +88,21 @@ def get_lists(user_id=None, book_id=None, list_id=None, limit=100):
         query = session.query(List)
 
         # parameters are treated like filters
+
         if list_id:
             # if list_id is provided, ignore other filters (just need 1)
             query = query.filter(List.list_id == list_id)
         else:
-            conditions = []
+            if user_name:
+                query = query.join(List.creator)
+                query = query.filter(User.username.ilike(f'%{user_name}%'))
+                # query = query.filter(List.creator.username.ilike(f'%{user_name}%'))
+            if list_name:
+                query = query.filter(List.title.ilike(f'%{list_name}%'))
             if user_id:
                 query = query.filter(List.creator_id == user_id)
             if book_id:
                 query = query.filter(List.books.any(id=book_id))
-
-            if conditions:
-                query = query.filter(and_(*conditions))
 
         # limit results
         results = query.limit(limit).all()

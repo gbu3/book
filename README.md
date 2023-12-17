@@ -40,6 +40,8 @@ Once the database has been created, be sure that each table has a primary and/or
 
 ## The App
 
+[Demo video](https://youtu.be/AXWkf4OLp2k)
+
 ### Mission statement
 
 būk is a web application intended to address readers' desires to rate and review books with ease, organize books they've loved into "playlists," and connect with friends over their favorite recent reads.

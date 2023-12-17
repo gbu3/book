@@ -40,7 +40,7 @@ Once the database has been created, be sure that each table has a primary and/or
 
 ## The App
 
-[Demo video](https://youtu.be/AXWkf4OLp2k)
+[Video demo of the application](https://youtu.be/AXWkf4OLp2k)
 
 ### Mission statement
 

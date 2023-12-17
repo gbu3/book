@@ -103,11 +103,6 @@ def main():
                     f_editions.write(f"\t{remove_special_char(data['publish_date'])}")
                 else:
                     f_editions.write(f"\t")
-                
-                if 'publish_country' in data:
-                    f_editions.write(f"\t{remove_special_char(data['publish_country'])}")
-                else:
-                    f_editions.write(f"\t")
                     
                 if 'by_statement' in data:
                     f_editions.write(f"\t{remove_special_char(data['by_statement'])}")

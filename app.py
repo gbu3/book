@@ -1,6 +1,7 @@
-from flask import Flask, request, make_response, redirect, url_for, jsonify, abort, render_template, flash
+from flask import Flask, Blueprint, request, make_response, redirect, url_for, jsonify, abort, render_template, flash
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user, AnonymousUserMixin
 from flask_sqlalchemy import SQLAlchemy
+from flask_swagger_ui import get_swaggerui_blueprint
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
@@ -26,8 +27,28 @@ app.secret_key = os.urandom(24)
 # Flask-Login setup
 login_manager = LoginManager()
 login_manager.init_app(app)
+login_manager.login_view = 'login' 
+
+# DB SETUP
 engine = create_engine(DB_URL)
 Session = scoped_session(sessionmaker(bind=engine))
+
+# SWAGGER UI setup
+
+SWAGGER_URL = '/api/docs'
+API_URL = '/static/swagger.yaml'
+
+swaggerui_blueprint = get_swaggerui_blueprint(
+    SWAGGER_URL,
+    API_URL,
+    config={
+        'app_name': "BŪK API"
+    },
+)
+
+app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
+
+#-----------------------------------------------------------------------
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -47,6 +68,9 @@ def load_user(user_id):
 # LOGIN ENDPOINTS
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    """
+    Logs the user in if they have correct credentials
+    """
     if request.method == 'GET':
         return render_template('login.html')
 
@@ -66,11 +90,21 @@ def unauthorized_handler():
 
 @app.route('/logout')
 def logout():
+    """
+    Logs the user out if they are logged in.
+    """
     logout_user()
     return redirect(url_for('login'))
 
 @app.route('/register', methods=['GET', 'POST'])
 def signup():
+    """
+    Allows user registration, provided that the
+    inputs provided are in the correct format.
+    A user account consists of username, full name,
+    email, phone, and password. Password will be
+    stored in a secure, encrypted format.
+    """
     if request.method == 'POST':
         username = request.form['username']
         full_name = request.form['full_name']
@@ -111,22 +145,30 @@ def signup():
 @app.route('/index', methods=['GET'])
 @login_required
 def index():
-    # put whatever needed into the HTML
+    """
+    Returns the home page.
+    """
     html = render_template("index.html")
 
     response = make_response(html)
     return response
 
 def get_error_page(message):
-    """Returns error page with a given error message """
+    """
+    Returns error page with a given error message
+    """
     html = render_template('error.html',
                            error_message = message)
-    response = make_response(html)
+    response = make_response(html, 400)
     return response
 
 @app.route('/about', methods=['GET'])
 @login_required
 def about():
+    """
+    Returns a page with more information about
+    the web application.
+    """
     html = render_template("about.html")
     response = make_response(html)
     return response
@@ -135,7 +177,8 @@ def about():
 @login_required
 def get_profile_info():
     """
-    get current user information for profile page
+    Returns the current user's profile page, 
+    where they can also edit their account.
     """
     user_dict = users.get_user_info(current_user.user_id)
     if user_dict:
@@ -149,7 +192,8 @@ def get_profile_info():
 @login_required
 def get_user_settings():
     """
-    loads the user settings page
+    Returns the user settings page, where
+    they can edit their account.
     """
     user_id = request.args.get('user_id')
     if not user_id:
@@ -163,6 +207,7 @@ def get_user_settings():
     if current_user.user_id != user_id:
         html = render_template("error.html",
                                error_message = "Access denied")
+        response = make_response(html, 403)
     else:
         user_dict = users.get_user_info(user_id)
         html = render_template("user_settings.html", user=user_dict)
@@ -172,6 +217,12 @@ def get_user_settings():
 @app.route('/search/users', methods=['GET', 'POST'])
 @login_required
 def get_user_search_page():
+    """
+    Returns a page where users can search
+    other users by user ID, username, full name,
+    email. Search results are automatically 
+    limited to 100, but can be specified.
+    """
     html = render_template("user_search.html")
     response = make_response(html)
     return response
@@ -179,6 +230,14 @@ def get_user_search_page():
 @app.route('/search/books', methods=['GET', 'POST'])
 @login_required
 def get_book_search_page():
+    """
+    Returns a page where users can search for
+    books by edition ID, work ID, author ID, 
+    author name, book title, publisher name,
+    and/or publication date. Search results
+    are automatically limited to 100, but can
+    be specified.
+    """
     html = render_template("book_search.html")
     response = make_response(html)
     return response
@@ -186,16 +245,29 @@ def get_book_search_page():
 @app.route('/search/authors', methods=['GET', 'POST'])
 @login_required
 def get_author_search_page():
+    """
+    Returns a page where users can search for
+    authors by ID or name. Search results are
+    automatically limited to 100, but can be
+    specified.
+    """
     html = render_template("author_search.html")
     response = make_response(html)
     return response
 
-# @app.route('/search/lists', methods=['GET', 'POST'])
-# @login_required
-# def get_list_search_page():
-#     html = render_template("list_search.html")
-#     response = make_response(html)
-#     return response
+@app.route('/search/lists', methods=['GET', 'POST'])
+@login_required
+def get_list_search_page():
+    """
+    Returns a page where users can search for
+    lists by the list creator's name and/or the
+    name of the list. Search results are 
+    automatically limited to 100, but can be
+    specified.
+    """
+    html = render_template("list_search.html")
+    response = make_response(html)
+    return response
 
 #-----------------------------------------------------------------------
 
@@ -205,15 +277,17 @@ def get_author_search_page():
 @login_required
 def search_books():
     """
-    search by:
+    Search books by:
     - title
     - author: name, fuller_name, personal_name, or author id
     - work id 
     - edition id
     - publish date
     - publisher name
-    search will be filtered by a combination of the given parameters
-    default limit is 100
+    Search will be filtered by a combination of the given parameters
+    The default limit is 100
+    Returns the search page with results, if the search
+    is valid. Otherwise, will just return the empty search page.
     """
     edition_id = request.args.get('edition_id')
     if edition_id:
@@ -248,6 +322,7 @@ def search_books():
     if all(arg is None for arg in [edition_id, work_id, author_name, author_id, title, publish_date, publisher_name]):
         html = render_template("book_search.html",
                                valid_search_terms=False)
+        response = make_response(html, 400)
     else:
         results = books.search_editions(
             edition_id=edition_id,
@@ -264,18 +339,26 @@ def search_books():
         html = render_template("book_search.html",
                                valid_search_terms=True,
                                results=results)
-    
-    response = make_response(html)
+        response = make_response(html)
+
     return response
 
 @app.route('/books/<string:edition_id>', methods=['GET'])
 @login_required
 def get_edition_info(edition_id):
+    """
+    Returns the individual book page, which provides
+    detailed information about the specific edition
+    and allows users to add the book to their personal
+    lists or view others' ratings and reviews (top 10).
+    """
     if not edition_id:
         abort(400, "edition id not provided")
     
     result = books.get_edition_info(edition_id)
     print(result)
+    if not result:
+        return get_error_page(f"Book with id {edition_id} not found")
 
     # if the current user already has a review, pass in the review_id
     curr_user_reviews = reviews.get_reviews(user_id=current_user.user_id, 
@@ -313,10 +396,11 @@ def wrong_route_books():
 @login_required
 def search_author():
     """
-    search an author by name, fuller_name, personal_name,
-    or author_id
-    returns a list of author dicts
-    limit of search results is default 100
+    Searches for an author by name, fuller_name, 
+    personal_name, or author_id.
+    Returns the author search page with results,
+    or search page with invalid terms/no results.
+    Limit of search results is default 100.
     """
     author_name = request.args.get('author_name')
     if author_name:
@@ -337,6 +421,7 @@ def search_author():
     if not author_name and not author_id:
         html = render_template("author_search.html",
                                valid_search_terms=False)
+        response = make_response(html, 400)
     
     else:
         results = books.search_author(
@@ -351,12 +436,19 @@ def search_author():
                                valid_search_terms=True,
                                results=results)
     
-    response = make_response(html)
+        response = make_response(html)
+
     return response
 
 @app.route('/authors/<string:author_id>', methods=['GET'])
 @login_required
 def get_author_info(author_id):
+    """
+    Gets the author's individual page with more
+    detailed information about the given author.
+    Also provides a link to search books by 
+    the author.
+    """
     if not author_id:
         abort(400, "author id not provided")
     
@@ -387,8 +479,9 @@ def wrong_route_authors():
 @login_required
 def search_users():
     """
-    search users by user_id, username, full_name, or email
+    Search users by user_id, username, full_name, or email
     LIMIT 100 unless otherwise specified
+    returns the user search page with results if any
     """
     user_id = request.args.get('user_id')
     if user_id:
@@ -404,7 +497,7 @@ def search_users():
         email = email.strip()
     if email and not re.match(r"[^@]+@[^@]+\.[^@]+", email):
         return make_response(render_template("user_search.html",
-                               valid_search_terms=False))
+                               valid_search_terms=False), 400)
     
     limit = request.args.get('limit')
     if limit:
@@ -419,6 +512,7 @@ def search_users():
     if not any([user_id, username, full_name, email]):
         html = render_template("user_search.html",
                                valid_search_terms=False)
+        response = make_response(html, 400)
         
     else:
         if not user_id:
@@ -439,17 +533,21 @@ def search_users():
         html = render_template("user_search.html",
                                valid_search_terms=True,
                                results=results)
-
-    response = make_response(html)
+        response = make_response(html)
+    
     return response
 
 @app.route('/users/<int:user_id>', methods=['GET'])
 @login_required
 def get_user(user_id):
     """
-    get user information by id
-    returns user_id, username, full_name, email, phone,
-    lists, reviews, following and followers
+    Get a user's information by id
+    Returns user_id, username, full_name, email, phone,
+    lists, reviews, following and followers in the
+    format of user profile page. 
+    If the user is current_user, will have a user
+    settings page option. Otherwise, will have
+    the option to follow or unfollow the user.
     """
     if not user_id:
         abort(400, "user not provided")
@@ -464,9 +562,10 @@ def get_user(user_id):
         html = render_template('profile.html', 
             user=user_dict, 
             is_follower=is_follower)
+        response = make_response(html)
     else:
         html = render_template('profile.html', user=None)
-    response = make_response(html)
+        response = make_response(html, 400)
     return response
 
 @app.route('/users', methods=['GET'])
@@ -478,37 +577,12 @@ def wrong_route_users():
     """
     return get_error_page("Error: missing users id"), 404
 
-@app.route('/users/<int:user_id>/followers', methods=['GET'])
-@login_required
-def get_followers(user_id):
-    """
-    returns a list of user_ids that follow the given user
-    """
-    try:
-        user_id = int(user_id)
-    except ValueError:
-        abort(400, "user_id is not an integer")
-
-    return jsonify(users.get_followers(user_id))
-
-@app.route('/users/<int:user_id>/following', methods=['GET'])
-@login_required
-def get_following(user_id):
-    """
-    returns a list of user_ids that the given user is following
-    """
-    try:
-        user_id = int(user_id)
-    except ValueError:
-        abort(400, "user_id is not an integer")
-
-    return jsonify(users.get_following(user_id))
-
 @app.route('/users/update/username', methods=['POST'])
 @login_required
 def update_username():
     """
-    update user's username.
+    Update user's username.
+    Only works if the user is authorized.
     """
     current_user_id = current_user.get_id()
     user_id = request.form.get('user_id')
@@ -531,7 +605,8 @@ def update_username():
 @login_required
 def update_full_name():
     """
-    update user's full name.
+    Update user's full name.
+    Only works if the user is authorized.
     """
     current_user_id = current_user.get_id()
     user_id = request.form.get('user_id')
@@ -554,7 +629,8 @@ def update_full_name():
 @login_required
 def update_user_email():
     """
-    update user's email
+    Update user's email.
+    Only works if the user is authorized.
     """
     current_user_id = current_user.get_id()
     user_id = request.form.get('user_id')
@@ -578,7 +654,8 @@ def update_user_email():
 @login_required
 def update_user_phone():
     """
-    update user's phone number
+    Update user's phone number.
+    Only works if the user is authorized.
     """
     current_user_id = current_user.get_id()
     user_id = request.form.get('user_id')
@@ -602,7 +679,9 @@ def update_user_phone():
 @login_required
 def follow_user(user_id):
     """
-    current user follows the given user
+    Follow the given user. Will return the
+    user's page on success, where follow status 
+    will have changed.
     """
     try:
         user_id = int(user_id)
@@ -617,7 +696,9 @@ def follow_user(user_id):
 @login_required
 def unfollow_user(user_id):
     """
-    current user unfollows the given user
+    Unfollow the given user. Will return the
+    user's page on success, where follow status 
+    will have changed.
     """
     try:
         user_id = int(user_id)
@@ -632,7 +713,10 @@ def unfollow_user(user_id):
 @login_required
 def delete_user(user_id):
     """
-    delete the user
+    Delete the user. On success, will return:
+    success message, response code 200.
+    On error, will return error message and
+    response code 400.
     """
     if current_user.user_id != user_id:
         abort(403, "Unauthorized access")
@@ -655,60 +739,22 @@ def delete_user(user_id):
 
 # reviews endpoints
 
-# @app.route('/reviews', methods=['GET', 'POST'])
-# @app.route('/reviews/', methods=['GET', 'POST'])
-# @login_required
-# def wrong_route_reviews():
-#     """
-#     Providing for incorrect usages of the reviews endpoint
-#     """
-#     return get_error_page("Error: missing review id"), 404
-
-# may not be needed
 @app.route('/reviews', methods=['GET'])
+@app.route('/reviews/', methods=['GET'])
 @login_required
-def get_reviews():
+def wrong_route_reviews():
     """
-    return a list of all the reviews written by a user, OR
-    return a list of all the reviews for a book, OR
-    return just the review
-    LIMIT 100 unless otherwise specified
+    Providing for incorrect usages of the reviews endpoint
     """
-    user_id = request.args.get("user")
-    book_id = request.args.get("book")
-    review_id = request.args.get("review")
-
-    if not user_id and not book_id and not review_id:
-        abort(400, "provide params")
-
-    limit = request.args.get("limit")
-    if not limit:
-        limit = 100
-
-    return jsonify(reviews.get_reviews(user_id, book_id, review_id, limit))
-    
-    # if user_id:
-    #     return jsonify(users.get_reviews(user_id, limit))
-    # if book_id:
-    #     try:
-    #         book_id = int(book_id)
-    #     except ValueError:
-    #         abort(400, "book_id is not an integer")
-    #     return jsonify(books.get_reviews(book_id, limit))
-    # if review_id:
-    #     try:
-    #         review_id = int(review_id)
-    #     except ValueError:
-    #         abort(400, "review_id is not an integer")
-    #     return jsonify(reviews.get_review(review_id))
+    return get_error_page("Error: missing review id"), 404
 
 @app.route('/reviews/<int:review_id>', methods=['GET'])
 @login_required
 def get_review_info(review_id):
     """
-    returns the HTML for the individual review page
-    if it is current_user's review, will have the
-    option to edit the review
+    Returns the HTML for the individual review page.
+    If it is current_user's review, will have the
+    option to edit the review.
     """
     if not review_id:
         abort(400, "review id not provided")
@@ -723,29 +769,26 @@ def get_review_info(review_id):
     response = make_response(html)
     return response
 
-@app.route('/reviews/create', methods=['GET', 'POST'])
+@app.route('/reviews/create', methods=['GET'])
 @login_required
 def get_create_review_page():
     """
-    gets the create new review page, which will
-    call create_review when info is submitted
-    redirects to the review page if successful
-    otherwise, back to the book page
+    Gets the create new review page, which will
+    call create_review when info is submitted.
+    Redirects to the review page if successful.
+    Otherwise, back to the book page.
     """
-    # if the user has already reviewed this book, return review pg
     book_id = request.args.get('book_id')
     if book_id:
         book_id = book_id.strip()
     else:
         abort(400, "no book id provided")
     
+    # if the user has already reviewed this book, return review pg
     existing_reviews = reviews.get_reviews(user_id=current_user.user_id, book_id=book_id)
     print("existing reviews: ", existing_reviews)
 
     if existing_reviews:
-        # in theory this should never happen - if the user has already
-        # reviewed the book, they should just get a "view my review"
-        # button on the book page
         return redirect(url_for('get_review_info', 
                                 review_id=existing_reviews[0]['review_id']))
     
@@ -761,8 +804,10 @@ def get_create_review_page():
 @login_required
 def create_review():
     """
-    creates a new review for the given book
-    authored by curr user
+    Creates a new review for the given book
+    authored by curr user. On success, will
+    redirect to result page. On error, will
+    abort the attempt.
     """
     book_id = request.form.get("book_id")
     
@@ -791,9 +836,9 @@ def create_review():
     try:
         rating = int(rating)
         if not 0 <= rating <= 10:
-            abort(400, "rating must be an integer 1 to 10.")
+            abort(400, "rating must be an integer 0 to 10.")
     except ValueError:
-        abort(400, "rating must be an integer 1 to 10.")
+        abort(400, "rating must be an integer 0 to 10.")
 
     result = reviews.create_review(
         book_id=book_id,
@@ -809,11 +854,14 @@ def create_review():
     else:
         abort(400, "failed to create review")
 
-    # return jsonify(reviews.create_review(book_id, current_user.user_id, summary, note, rating))
-
-@app.route('/reviews/<int:review_id>/update', methods=['GET', 'POST'])
+@app.route('/reviews/<int:review_id>/update', methods=['GET'])
 @login_required
 def get_update_review_page(review_id):
+    """
+    Returns the update review page, which 
+    allows the user to edit their existing
+    review of a book (rating, summary).
+    """
     try:
         review_id = int(review_id)
     except ValueError:
@@ -821,7 +869,7 @@ def get_update_review_page(review_id):
 
     existing_review = reviews.get_review_info(review_id)
     if not existing_review:
-        return get_error_page("Error: review does not exist"), 404
+        return get_error_page("Error: review does not exist")
     
     print(existing_review)
 
@@ -835,7 +883,10 @@ def get_update_review_page(review_id):
 @login_required
 def update_review(review_id):
     """
-    update an existing review
+    Updates an existing review, either
+    rating or summary. On success, returns
+    the updated review page. On error, 
+    attempt will be aborted.
     """
     try:
         review_id = int(review_id)
@@ -864,9 +915,9 @@ def update_review(review_id):
         try:
             rating = int(rating)
             if not 0 <= rating <= 10:
-                abort(400, "rating must be an integer 1 to 10.")
+                abort(400, "rating must be an integer 0 to 10.")
         except ValueError:
-            abort(400, "rating must be an integer 1 to 10.")
+            abort(400, "rating must be an integer 0 to 10.")
 
     result = reviews.update_review(
         review_id=review_id,
@@ -884,7 +935,9 @@ def update_review(review_id):
 @login_required
 def delete_review(review_id):
     """
-    delete a review
+    Delete a review. On success, returns success
+    message and response code 200. On error, 
+    returns error message and code 400.
     """
     try:
         review_id = int(review_id)
@@ -905,68 +958,60 @@ def delete_review(review_id):
         flash("Failed to delete review", "error")
         return jsonify({"success": False, "message": "failed to delete review"}), 400
 
-
-
 #-----------------------------------------------------------------------
 
 # lists endpoints
-@app.route('/lists/search')
+@app.route('/lists/search', methods=['GET'])
 @login_required
 def search_lists():
     """
-    return all lists that match a keyword/phrase
-    LIMIT 100 unless otherwise specified
+    Search lists by the user's name or the list name.
+    LIMIT 100 unless otherwise specified.
+    Returns the list search page with results, if any.
     """
-    search_terms = request.args.get('search')
-    if not search_terms:
-        return jsonify(None)
+    # can add books to this endpoint in the future
+
+    user_name = request.args.get('user_name')
+    if user_name:
+        user_name = user_name.strip()
+    list_name = request.args.get('list_title')
+    if list_name:
+        list_name = list_name.strip()
+    limit = request.args.get('limit')
+    if limit:
+        limit = limit.strip()
+
+    try:
+        limit = int(limit) if limit else None
+    except ValueError:
+        abort(400, "limit must be an integer")
+
+    if all(arg is None for arg in [user_name, list_name]):
+        html = render_template("list_search.html",
+                               valid_search_terms=False)
     
-    limit = request.args.get("limit")
-    if not limit:
-        limit = 100
+    else:
+        results = lists.get_lists(
+            user_name=user_name, 
+            list_name=list_name, 
+            limit=limit)
+        print(results)
 
-    return jsonify(lists.search_lists(search_terms, limit))
+        html = render_template("list_search.html",
+                               valid_search_terms=True,
+                               results=results)
 
-@app.route('/lists', methods=['GET'])
-@login_required
-def get_lists():
-    """
-    return all lists made by one user, OR
-    return all lists that contain the given book, OR
-    return the list if it exists
-    LIMIT 100 unless otherwise specified
-    """
-    user_id = request.args.get("user")
-    book_id = request.args.get("book")
-    list_id = request.args.get("list")
-
-    if not user_id and not book_id and not list_id:
-        abort(400, "provide params")
-
-    limit = request.args.get("limit")
-    if not limit:
-        limit = 100
-
-    return lists.get_lists(user_id, book_id, list_id, limit)
-    
-    if user_id:
-        return jsonify(users.get_lists(user_id, limit))
-    if book_id:
-        try:
-            book_id = int(book_id)
-        except ValueError:
-            abort(400, "book_id is not an integer")
-        return jsonify(books.get_lists(book_id, limit))
-    if list_id:
-        try:
-            list_id = int(list_id)
-        except ValueError:
-            abort(400, "list_id is not an integer")
-        return jsonify(lists.get_list(list_id))
+    response = make_response(html)
+    return response
     
 @app.route('/lists/<int:list_id>', methods=['GET'])
 @login_required
 def get_list_info(list_id):
+    """
+    Gets individual list page with information
+    about the list. If it is the user's list,
+    they will have the option to edit the list.
+    """
     if not list_id:
         abort(400, "list id not provided")
     
@@ -980,14 +1025,14 @@ def get_list_info(list_id):
     response = make_response(html)
     return response
 
-@app.route('/lists/create', methods=['GET', 'POST'])
+@app.route('/lists/create', methods=['GET'])
 @login_required
 def get_create_list_page():
     """
-    gets the create new list page, which will
-    call create_list when info is submitted
-    redirects to the list page if successful
-    otherwise, back to create list page
+    Gets the create new list page, which will
+    call create_list when info is submitted.
+    Redirects to the list page if successful.
+    Otherwise, back to create list page.
     """
 
     html = render_template("create_list.html", 
@@ -999,7 +1044,9 @@ def get_create_list_page():
 @login_required
 def create_list():
     """
-    creates a new list authored by curr user
+    Creates a new list authored by curr user.
+    On success, will return the individual list page.
+    On failure, will return the create list page again.
     """
     title = request.form.get("title")
     description = request.form.get("description")
@@ -1022,9 +1069,14 @@ def create_list():
     else:
         return redirect(url_for('get_create_list_page'))
 
-@app.route('/lists/<int:list_id>/update', methods=['GET', 'POST'])
+@app.route('/lists/<int:list_id>/update', methods=['GET'])
 @login_required
 def get_update_list_page(list_id):
+    """
+    Returns the update list page, where users
+    can change the title or description of their list,
+    remove books, or delete the list.
+    """
     try:
         list_id = int(list_id)
     except ValueError:
@@ -1032,7 +1084,7 @@ def get_update_list_page(list_id):
 
     existing_list = lists.get_list_info(list_id)
     if not existing_list:
-        return get_error_page("Error: list does not exist"), 404
+        return get_error_page("Error: list does not exist")
     
     print(existing_list)
 
@@ -1046,7 +1098,10 @@ def get_update_list_page(list_id):
 @login_required
 def update_list(list_id):
     """
-    update an existing list
+    Updates the title or description of 
+    an existing list. On success, will return
+    the updated list page. On error, attempt
+    will be aborted.
     """
     try:
         list_id = int(list_id)
@@ -1091,7 +1146,11 @@ def update_list(list_id):
 @login_required
 def add_list_book(book_id):
     """
-    adds the book to the given list.
+    Adds the book to the given list. If successful,
+    will flash a success message; if error, will
+    flash an error message. Returns the individual
+    list page, which will show whether the book
+    has been added or not.
     """
     list_id = request.form.get('list_id')
     if not list_id:
@@ -1110,7 +1169,11 @@ def add_list_book(book_id):
 @login_required
 def delete_book_from_list(book_id):
     """
-    removes the specified book from the specified list.
+    Removes the specified book from the 
+    specified list. On success, will return a
+    success message with response code 200.
+    On error, will return an error message
+    with response code 400.
     """
     list_id = request.form.get("list_id")
     if not list_id:
@@ -1136,7 +1199,10 @@ def delete_book_from_list(book_id):
 @login_required
 def delete_list(list_id):
     """
-    delete a list
+    Delete an entire list. On success, will
+    return success message with response code 200.
+    On error, will return error message with
+    response code 400.
     """
     try:
         list_id = int(list_id)
@@ -1156,7 +1222,6 @@ def delete_list(list_id):
         print("failed to delete list")
         flash("Failed to delete list", "error")
         return jsonify({"success": False, "message": "failed to delete list"}), 400
-
 
 
 if __name__ == '__main__':

@@ -13,7 +13,7 @@ def test_create_review(book_id, user_id, summary, rating):
 
 def test_get_reviews_user():
     print("test_get_reviews_user")
-    reviews = review.get_reviews(user_id=user_id)
+    reviews = review.get_reviews(user_id=1)
     for r in reviews:
         print(r)
     print()
@@ -91,7 +91,7 @@ if __name__ == '__main__':
     # test_create_review(book_id=kundera,
     #                     summary = "One of the best books I read this summer, masterful prose and incredible literary treatment of concepts like love, humanity, and politics",
     #                     rating=9)
-    # test_get_reviews_user()
+    test_get_reviews_user()
     # test_get_reviews_book(sanshiro)
     # test_get_reviews_book_user()
     # test_get_all_reviews()

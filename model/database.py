@@ -117,20 +117,17 @@ class Editions(Base):
     number_of_pages = Column(Integer)
     pagination = Column(String)
     translation_of = Column(String)
-    dewey_decimal_class = Column(String) # MAY NEED TO NORMALIZE
-    # lccn = Column(Integer) # need to convert from string
+    dewey_decimal_class = Column(String)
 
     # assoc tables
     authors = relationship("Authors", secondary="editions_authors", back_populates="editions")
     works = relationship("Works", secondary="editions_works", back_populates="editions")
-    # classifications = relationship("Classifications", secondary="editions_classifications", back_populates="editions")
     contributors = relationship("Contributors", secondary="editions_contributors", back_populates="editions")
     genres = relationship("Genres", secondary="editions_genres", back_populates="editions")
     languages = relationship("Languages", secondary="editions_languages", back_populates="editions")
     lc_classifications = relationship("LC_Classifications", secondary="editions_lc_class", back_populates="editions")
     lccn = relationship("LCCN", secondary="editions_lccn", back_populates="editions")
     publishers = relationship("Publishers", secondary="editions_publishers", back_populates="editions")
-    # publish_countries = relationship("Publish_Countries", secondary="editions_publish_countries", back_populates="editions")
     publish_places = relationship("Places", secondary="editions_publish_places", back_populates="editions")
     series = relationship("Series", secondary="editions_series", back_populates="editions")
     subjects = relationship("Subjects", secondary="editions_subjects", back_populates="editions")
@@ -176,7 +173,6 @@ class Genres(Base):
     id = Column(Integer, primary_key=True)
     genre = Column(String)
     editions = relationship("Editions", secondary="editions_genres", back_populates="genres")
-    # authors = relationship("Authors", secondary="authors_genres", back_populates="genres")
 
 editions_genres = Table('editions_genres', Base.metadata,
     Column('id', Integer, primary_key=True),
@@ -199,15 +195,12 @@ class ISBN_13(Base):
     edition = relationship("Editions")
 
 class Languages(Base):
-    # based on languages in fields in 
-    # editions: language, languages, translated_from; 
-    # and authors->’languages’; 
+    # based on languages in fields in editions: language, languages, translated_from; 
     # and works->’original_languages’
     __tablename__ = 'languages'
     id = Column(Integer, primary_key=True)
     language = Column(String)
     editions = relationship("Editions", secondary="editions_languages", back_populates="languages")
-    # authors = relationship("Authors", secondary="authors_languages", back_populates="languages")
     works = relationship("Works", secondary="works_original_languages", back_populates="original_languages")
 
 editions_languages = Table('editions_languages', Base.metadata,
@@ -289,12 +282,11 @@ editions_series = Table('editions_series', Base.metadata,
 )
 
 class Subjects(Base):
-    # from editions, authors, and works
+    # from editions and works
     __tablename__ = 'subjects'
     id = Column(Integer, primary_key=True)
     subject = Column(String)
     editions = relationship("Editions", secondary="editions_subjects", back_populates="subjects")
-    # authors = relationship("Authors", secondary="authors_subjects", back_populates="subjects")
     works = relationship("Works", secondary="works_subjects", back_populates="subjects")
 
 editions_subjects = Table('editions_subjects', Base.metadata,
@@ -315,37 +307,6 @@ editions_work_titles = Table('editions_work_titles', Base.metadata,
     Column('work_title_id', Integer, ForeignKey('work_titles.id'))
 )
 
-# class Classifications(Base):
-#     __tablename__ = 'classifications'
-#     id = Column(Integer, primary_key=True)
-#     classification = Column(String)
-#     editions = relationship("Editions", secondary="editions_classifications", back_populates="classifications")
-
-# editions_classifications = Table('editions_classifications', Base.metadata,
-#     Column('id', Integer, primary_key=True),
-#     Column('edition_id', String, ForeignKey('editions.id')),
-#     Column('classification_id', Integer, ForeignKey('classifications.id'))
-# )
-
-# class Publish_Countries(Base):
-#     __tablename__ = 'publish_countries'
-#     id = Column(Integer, primary_key=True)
-#     publish_country = Column(String)
-#     editions = relationship("Editions", secondary="editions_publish_countries", back_populates="publish_countries")
-
-# editions_publish_countries = Table('editions_publish_countries', Base.metadata,
-#     Column('id', Integer, primary_key=True),
-#     Column('edition_id', String, ForeignKey('editions.id')),
-#     Column('publish_country_id', Integer, ForeignKey('publish_countries.id'))
-# )
-
-# class Notes(Base):
-#     __tablename__ = 'notes'
-#     id = Column(Integer, primary_key=True)
-#     note = Column(String)
-#     edition_id = Column(String, ForeignKey('editions.id'))
-#     edition = relationship("Editions")
-
 # ---------------- AUTHORS ----------------
 
 class Authors(Base):
@@ -361,18 +322,13 @@ class Authors(Base):
     birth_date = Column(String)
     death_date = Column(String)
     date = Column(String)
-    entity_type = Column(String)  # Combined entity_type and entiy_type
+    entity_type = Column(String) # Combined entity_type and entiy_type
     bio = Column(Text)
-    # lccn = Column(Integer) # CONVERT FROM STRING
 
     # assoc tables
     editions = relationship("Editions", secondary="editions_authors", back_populates="authors")
     works = relationship("Works", secondary="works_authors", back_populates="authors")
-    # alternate_names = relationship("Alternate_Names", secondary="authors_alternate_names", back_populates="authors")
-    # genres = relationship("Genres", secondary="authors_genres", back_populates="authors")
-    # languages = relationship("Languages", secondary="authors_languages", back_populates="authors")
     locations = relationship("Places", secondary="authors_locations", back_populates="authors")
-    # subjects = relationship("Subjects", secondary="authors_subjects", back_populates="authors")
 
 authors_locations = Table('authors_locations', Base.metadata,
     Column('id', Integer, primary_key=True),
@@ -387,40 +343,6 @@ class Author_Photos(Base):
     photo = Column(Integer)
     author_id = Column(String, ForeignKey('authors.id'))
     author = relationship("Authors")
-
-################# UNUSED ##################
-
-# # alternate names
-# class Alternate_Names(Base):
-#     __tablename__ = 'alternate_names'
-#     id = Column(Integer, primary_key=True)
-#     name = Column(String)
-#     authors = relationship("Authors", secondary="authors_alternate_names", back_populates="alternate_names")
-
-# authors_alternate_names = Table('authors_alternate_names', Base.metadata,
-#     Column('id', Integer, primary_key=True),
-#     Column('author_id', String, ForeignKey('authors.id')),
-#     Column('alternate_name_id', Integer, ForeignKey('alternate_names.id'))
-# )
-
-# authors_genres = Table('authors_genres', Base.metadata,
-#     Column('id', Integer, primary_key=True),
-#     Column('author_id', String, ForeignKey('authors.id')),
-#     Column('genre_id', Integer, ForeignKey('genres.id'))
-# )
-
-# authors_languages = Table('authors_languages', Base.metadata,
-#     Column('id', Integer, primary_key=True),
-#     Column('author_id', String, ForeignKey('authors.id')),
-#     Column('language_id', Integer, ForeignKey('languages.id'))
-# )
-
-# authors_subjects = Table('authors_subjects', Base.metadata,
-#     Column('id', Integer, primary_key=True),
-#     Column('author_id', String, ForeignKey('authors.id')),
-#     Column('subject_id', Integer, ForeignKey('subjects.id'))
-# )
-
 
 # ---------------- WORKS ----------------
 
@@ -460,7 +382,7 @@ class Works_Covers(Base):
     id = Column(Integer, primary_key=True)
     cover = Column(Integer)
     work_id = Column(String, ForeignKey('works.id'))
-    work = relationship("Works") # MAYBE??
+    work = relationship("Works")
 
 cover_editions = Table('works_cover_editions', Base.metadata,
     # from works.cover_edition
@@ -526,8 +448,6 @@ works_translated_titles = Table('works_translated_titles', Base.metadata,
 )
 
 
-
-
 if __name__ == '__main__':
     engine = create_engine(DB_URL)
             
@@ -535,9 +455,4 @@ if __name__ == '__main__':
     session = Session()
 
     # Base.metadata.drop_all(engine)
-    Base.metadata.create_all(engine, tables=[Base.metadata.tables['users'],
-                                             Base.metadata.tables['user_followers'],
-                                             Base.metadata.tables['likes'],
-                                         Base.metadata.tables['reviews'],
-                                         Base.metadata.tables['lists'],
-                                         Base.metadata.tables['list_books']])
+    Base.metadata.create_all(engine)

@@ -1,0 +1,1239 @@
+swagger: '2.0'
+info:
+  title: BŪK API
+  version: 1.0.0
+paths:
+  /register:
+    post:
+      summary: User registration
+      description: Allows user registration, provided that the inputs provided are in the correct format.
+      tags:
+        - User Authentication
+      produces:
+        - text/html
+      parameters:
+        - in: formData
+          name: username
+          type: string
+          required: true
+          description: Desired username
+        - in: formData
+          name: full_name
+          type: string
+          required: true
+          description: Full name of the user
+        - in: formData
+          name: email
+          type: string
+          required: true
+          description: Email address
+        - in: formData
+          name: phone
+          type: string
+          required: true
+          description: Contact phone number
+        - in: formData
+          name: password
+          type: string
+          required: true
+          description: Account password
+        - in: formData
+          name: confirm_password
+          type: string
+          required: true
+          description: Confirmation of the account password
+      responses:
+        302:
+          description: Redirects to the login page after successful registration
+          headers:
+            Location:
+              description: Login page
+              type: string
+              example: '/login'
+        400:
+          description: Error in user registration data
+
+  /login:
+    get: 
+      summary: Login page
+      description: Allows user to input their login credentials.
+      tags:
+        - User Authentication
+      produces:
+        - text/html
+      responses:
+        200:
+          description: Login page
+          content:
+            text/html:
+              schema:
+                type: string
+                example: "<!DOCTYPE html><html lang='en'><head>...</head><body>...</body></html>"
+    post:
+      summary: User authentication
+      description: Processes login credentials.
+      tags:
+        - User Authentication
+      produces:
+        - text/html
+      parameters:
+        - in: formData
+          name: email
+          type: string
+          required: true
+          description: User's email
+        - in: formData
+          name: password
+          type: string
+          required: true
+          description: User password
+      responses:
+        302:
+          description: Login successful, redirected to index page
+          headers:
+            Location:
+              description: Index page
+              type: string
+              example: '/index'
+        401:
+          description: Unauthorized, redirects to login page
+          headers:
+            Location:
+              description: Login page
+              type: string
+              example: '/login'
+
+  /logout:
+    get:
+      summary: User logout
+      description: Logs the user out if they are logged in.
+      tags:
+        - User Authentication
+      produces:
+        - text/html
+      responses:
+        302:
+          description: Redirects to the login page
+          headers:
+            Location:
+              description: Login page
+              type: string
+              example: '/login'
+
+  /:
+    get:
+      summary: Home Page
+      description: Returns the home page of the web application.
+      tags:
+        - Pages
+      produces:
+        - text/html
+      responses:
+        200:
+          description: Home page content
+        401:
+          description: Unauthorized access, user is redirected to the login page
+          headers:
+            Location:
+              description: Login page
+              type: string
+              example: '/login'
+
+  /index:
+    get:
+      summary: Home Page (Alternate URL)
+      description: Returns the home page of the web application (alternate URL).
+      tags:
+        - Pages
+      produces:
+        - text/html
+      responses:
+        200:
+          description: Home page content
+        401:
+          description: Unauthorized access, user is redirected to the login page
+          headers:
+            Location:
+              description: Login page
+              type: string
+              example: '/login'
+
+  /about:
+    get:
+      summary: About Page
+      description: Returns a page with more information about the web application.
+      tags:
+        - Pages
+      produces:
+        - text/html
+      responses:
+        200:
+          description: About page content
+        401:
+          description: Unauthorized access, user is redirected to the login page
+          headers:
+            Location:
+              description: Login page
+              type: string
+              example: '/login'
+
+  /users/profile:
+    get:
+      summary: User Profile Page
+      description: Returns the current user's profile page.
+      tags:
+        - Pages
+      produces:
+        - text/html
+      responses:
+        200:
+          description: User profile page content
+        401:
+          description: Unauthorized access, user is redirected to the login page
+          headers:
+            Location:
+              description: Login page
+              type: string
+              example: '/login'
+
+  /users/settings:
+    get:
+      summary: User Settings Page
+      description: Returns the user settings page for account editing.
+      tags:
+        - Pages
+      produces:
+        - text/html
+      parameters:
+        - name: user_id
+          in: query
+          type: integer
+          description: User ID of the desired user
+      responses:
+        200:
+          description: User settings page content
+        400:
+          description: User ID not provided or invalid
+        401:
+          description: Unauthorized access, user is redirected to the login page
+          headers:
+            Location:
+              description: Login page
+              type: string
+              example: '/login'
+        403:
+          description: Unauthorized access, error page is returned
+          
+
+  /search/users:
+    get:
+      summary: User Search Page
+      description: Returns a page for searching other users by various criteria.
+      tags:
+        - Pages
+      produces:
+        - text/html
+      responses:
+        200:
+          description: User search page content
+        401:
+          description: Unauthorized access, user is redirected to the login page
+          headers:
+            Location:
+              description: Login page
+              type: string
+              example: '/login'
+
+  /search/books:
+    get:
+      summary: Book Search Page
+      description: Returns a page for searching books by various criteria.
+      tags:
+        - Pages
+      produces:
+        - text/html
+      responses:
+        200:
+          description: Book search page content
+        401:
+          description: Unauthorized access, user is redirected to the login page
+          headers:
+            Location:
+              description: Login page
+              type: string
+              example: '/login'
+
+  /search/authors:
+    get:
+      summary: Author Search Page
+      description: Returns a page for searching authors by ID or name.
+      tags:
+        - Pages
+      produces:
+        - text/html
+      responses:
+        200:
+          description: Author search page content
+        401:
+          description: Unauthorized access, user is redirected to the login page
+          headers:
+            Location:
+              description: Login page
+              type: string
+              example: '/login'
+
+  /search/lists:
+    get:
+      summary: List Search Page
+      description: Returns a page for searching lists by the list creator's name or the name of the list.
+      tags:
+        - Pages
+      produces:
+        - text/html
+      responses:
+        200:
+          description: List search page content
+        401:
+          description: Unauthorized access, user is redirected to the login page
+          headers:
+            Location:
+              description: Login page
+              type: string
+              example: '/login'
+
+
+  /books/search:
+    get:
+      summary: Search for books
+      description: >
+        Search books by various criteria such as title, author, work id, edition id, publish date, and publisher name. Returns a search page with the results.
+      tags:
+        - BOOKS
+      produces:
+        - text/html
+      parameters:
+        - name: edition_id
+          in: query
+          type: string
+          description: ID of the desired edition
+        - name: work_id
+          in: query
+          type: string
+          description: ID of the work that the edition falls under (one-to-many relationship)
+        - name: author_name
+          in: query
+          type: string
+          description: Author's name
+        - name: author_id
+          in: query
+          type: string
+          description: Author's particular ID
+        - name: title
+          in: query
+          type: string
+          description: Title of the edition
+        - name: publisher_name
+          in: query
+          type: string
+          description: Particular publisher of the edition
+        - name: publish_date
+          in: query
+          type: string
+          description: Publication year of the edition
+        - name: limit
+          in: query
+          type: integer
+          default: 100
+          description: Max number of results to return
+      responses:
+        200:
+          description: The search page with books matching the search criteria
+        400:
+          description: Bad request, limit must be an integer, or no valid search terms provided
+        401:
+          description: Unauthorized access, user is redirected to the login page
+          headers:
+            Location:
+              description: Login page
+              type: string
+              example: '/login'
+
+  /books/{edition_id}:
+    get:
+      summary: Get book information by edition ID
+      description: Returns detailed information about the book for the given edition ID.
+      tags:
+        - BOOKS
+      produces:
+        - text/html
+      parameters:
+        - name: edition_id
+          in: path
+          required: true
+          type: string
+          description: Edition ID of the desired edition
+      responses:
+        200:
+          description: Detailed information about the book edition
+        400:
+          description: Edition ID not provided or book not found
+        401:
+          description: Unauthorized access, user is redirected to the login page
+          headers:
+            Location:
+              description: Login page
+              type: string
+              example: '/login'
+
+  /books:
+    get:
+      summary: Error handling for incorrect book endpoint usage
+      description: Provides an error page for missing book ID in the URL.
+      tags:
+        - BOOKS
+      produces:
+        - text/html
+      responses:
+        404:
+          description: Missing book ID error page
+
+  /books/:
+    get:
+      summary: Error handling for incorrect book endpoint usage
+      description: Provides an error page for missing book ID in the URL.
+      tags:
+        - BOOKS
+      produces:
+        - text/html
+      responses:
+        404:
+          description: Missing book ID error page
+
+  /authors/search:
+    get:
+      summary: Search for authors
+      description: Searches for an author by name, fuller_name, personal_name, or author_id.
+      tags:
+        - AUTHORS
+      produces:
+        - text/html
+      parameters:
+        - name: author_name
+          in: query
+          type: string
+          description: Name of the author
+        - name: author_id
+          in: query
+          type: string
+          description: Author's ID
+        - name: limit
+          in: query
+          type: integer
+          default: 100
+          description: Max number of results to return
+      responses:
+        200:
+          description: Returns the search page with a list of authors matching the search criteria
+        400:
+          description: No or invalid search terms provided
+        401:
+          description: Unauthorized access, user is redirected to the login page
+          headers:
+            Location:
+              description: Login page
+              type: string
+              example: '/login'
+
+  /authors/{author_id}:
+    get:
+      summary: Get author information by author ID
+      description: Returns detailed information about the author for the given author ID.
+      tags:
+        - AUTHORS
+      produces:
+        - text/html
+      parameters:
+        - name: author_id
+          in: path
+          required: true
+          type: string
+          description: ID of the desired author
+      responses:
+        200:
+          description: Detailed information about the author
+        400:
+          description: Author ID not provided
+        401:
+          description: Unauthorized access, user is redirected to the login page
+          headers:
+            Location:
+              description: Login page
+              type: string
+              example: '/login'
+
+  /authors:
+    get:
+      summary: Error handling for incorrect author endpoint usage
+      description: Provides an error page for missing author ID in the URL.
+      tags:
+        - AUTHORS
+      produces:
+        - text/html
+      responses:
+        404:
+          description: Missing author ID error page
+
+  /authors/:
+    get:
+      summary: Error handling for incorrect author endpoint usage
+      description: Provides an error page for missing author ID in the URL.
+      tags:
+        - AUTHORS
+      produces:
+        - text/html
+      responses:
+        404:
+          description: Missing author ID error page
+
+
+
+  /users/search:
+    get:
+      summary: Search for users
+      description: Search users by user_id, username, full_name, or email. The search is limited to 100 results unless specified.
+      tags:
+        - USERS
+      produces:
+        - text/html
+      parameters:
+        - name: user_id
+          in: query
+          type: integer
+          description: User's ID
+        - name: username
+          in: query
+          type: string
+          description: User's username, or part of it
+        - name: full_name
+          in: query
+          type: string
+          description: User's full name, or part of it
+        - name: email
+          in: query
+          type: string
+          description: User's email
+        - name: limit
+          in: query
+          type: integer
+          default: 100
+          description: Max number of results to return
+      responses:
+        200:
+          description: User search page with results
+        400:
+          description: Invalid input or user_id and limit must be integers
+        401:
+          description: Unauthorized access
+          headers:
+            Location:
+              description: Login page
+              type: string
+              example: '/login'
+
+  /users/{user_id}:
+    get:
+      summary: Get user information by ID
+      description: Retrieve a user's information by their user ID. Returns information including username, full name, email, phone, lists, reviews, followers, and following status.
+      tags:
+        - USERS
+      produces:
+        - text/html
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          type: integer
+          description: ID of the desired user
+      responses:
+        200:
+          description: User profile information
+        400:
+          description: User ID not provided or not found
+        401:
+          description: Unauthorized access
+          headers:
+            Location:
+              description: Login page
+              type: string
+              example: '/login'
+    delete:
+      summary: Delete a user
+      description: Deletes a user by their ID. Only accessible to the user themselves.
+      tags:
+        - USERS
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          type: integer
+          description: ID of the user to delete
+      responses:
+        200:
+          description: User deleted successfully
+        400:
+          description: User ID not provided or invalid
+          headers:
+            Location:
+              description: Login page
+              type: string
+              example: '/login'
+        403:
+          description: Unauthorized access, user cannot delete this account
+
+  /users/update/username:
+    post:
+      summary: Update user's username
+      description: Allows a user to update their username. Requires authorization as the user.
+      tags:
+        - USERS
+      produces:
+        - text/html
+      parameters:
+        - name: user_id
+          in: formData
+          type: integer
+          required: true
+          description: User ID of the user to update
+        - name: username
+          in: formData
+          type: string
+          required: true
+          description: Updated username
+      responses:
+        200:
+          description: Username updated successfully, redirects to user settings
+        400:
+          description: User ID not provided or invalid, redirects to user settings
+        403:
+          description: Unauthorized access, user cannot update this information
+
+  /users/update/full_name:
+    post:
+      summary: Update user's full name
+      description: Allows a user to update their full name. Requires authorization as the user.
+      tags:
+        - USERS
+      produces:
+        - text/html
+      parameters:
+        - name: user_id
+          in: formData
+          type: integer
+          required: true
+          description: User ID of the user to update
+        - name: full_name
+          in: formData
+          type: string
+          required: true
+          description: Updated full name
+      responses:
+        200:
+          description: Full name updated successfully, redirects to user settings
+        400:
+          description: User ID not provided or invalid, redirects to user settings
+        403:
+          description: Unauthorized access, user cannot update this information
+
+  /users/update/email:
+    post:
+      summary: Update user's email
+      description: Allows a user to update their email. Requires authorization as the user.
+      tags:
+        - USERS
+      produces:
+        - text/html
+      parameters:
+        - name: user_id
+          in: formData
+          type: integer
+          required: true
+          description: User ID of the user to update
+        - name: email
+          in: formData
+          type: string
+          required: true
+          description: Updated email
+      responses:
+        200:
+          description: Email updated successfully, redirects to user settings
+        400:
+          description: User ID not provided or invalid, redirects to user settings
+        403:
+          description: Unauthorized access, user cannot update this information
+
+  /users/update/phone:
+    post:
+      summary: Update user's phone
+      description: Allows a user to update their phone. Requires authorization as the user.
+      tags:
+        - USERS
+      produces:
+        - text/html
+      parameters:
+        - name: user_id
+          in: formData
+          type: integer
+          required: true
+          description: User ID of the user to update
+        - name: phone
+          in: formData
+          type: string
+          required: true
+          description: Updated phone number
+      responses:
+        200:
+          description: Phone updated successfully, redirects to user settings
+        400:
+          description: User ID not provided or invalid, redirects to user settings
+        403:
+          description: Unauthorized access, user cannot update this information
+
+  /users/{user_id}/follow:
+    post:
+      summary: Follow a user
+      description: Allows the current user to follow another user by their ID.
+      tags:
+        - USERS
+      produces:
+        - text/html
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          type: integer
+          description: User ID of the user to follow
+      responses:
+        200:
+          description: User followed successfully, redirects to user's page
+        400:
+          description: User ID not provided or invalid
+        401:
+          description: Unauthorized access
+          headers:
+            Location:
+              description: Login page
+              type: string
+              example: '/login'
+
+  /users/{user_id}/unfollow:
+    post:
+      summary: Unfollow a user
+      description: Allows the current user to unfollow another user by their ID.
+      tags:
+        - USERS
+      produces:
+        - text/html
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          type: integer
+          description: User ID of the user to unfollow
+      responses:
+        200:
+          description: User unfollowed successfully, redirects to user's page
+        400:
+          description: User ID not provided or invalid
+        401:
+          description: Unauthorized access
+          headers:
+            Location:
+              description: Login page
+              type: string
+              example: '/login'
+
+  /users:
+    get:
+      summary: Error handling for incorrect user endpoint usage
+      description: Provides an error page for missing user ID in the URL.
+      tags:
+        - USERS
+      produces:
+        - text/html
+      responses:
+        404:
+          description: Missing user ID error page
+
+  /users/:
+    get:
+      summary: Error handling for incorrect user endpoint usage
+      description: Provides an error page for missing user ID in the URL.
+      tags:
+        - USERS
+      produces:
+        - text/html
+      responses:
+        404:
+          description: Missing user ID error page
+
+
+  /reviews:
+    get:
+      summary: Error handling for incorrect review endpoint usage
+      description: Returns an error page for incorrect usage of the reviews endpoint.
+      tags:
+        - REVIEWS
+      produces:
+        - text/html
+      responses:
+        404:
+          description: Error message for missing review ID
+    post:
+      summary: Create a review
+      description: Creates a new review for a given book.
+      tags:
+        - REVIEWS
+      produces:
+        - text/html
+      parameters:
+        - name: book_id
+          in: formData
+          required: true
+          type: string
+          description: Book ID to review
+        - name: summary
+          in: formData
+          type: string
+          description: Summary of user's thoughts on the book (max 300 char)
+        - name: rating
+          in: formData
+          type: integer
+          description: Rating for the book out of 10
+      responses:
+        200:
+          description: Review created and redirects to the new review page
+        400:
+          description: Book ID not provided or does not exist, or invalid input
+        401:
+          description: Unauthorized access
+          headers:
+            Location:
+              description: Login page
+              type: string
+              example: '/login'
+
+  /reviews/{review_id}:
+    get:
+      summary: Get individual review information
+      description: Get the individual review page.
+      tags:
+        - REVIEWS
+      produces:
+        - text/html
+      parameters:
+        - name: review_id
+          in: path
+          required: true
+          type: integer
+          description: Review ID of the desired review
+      responses:
+        200:
+          description: Individual review page
+        400:
+          description: Review ID not provided
+        401:
+          description: Unauthorized access
+          headers:
+            Location:
+              description: Login page
+              type: string
+              example: '/login'
+    post:
+      summary: Update a review
+      description: Updates an existing review.
+      tags:
+        - REVIEWS
+      produces:
+        - text/html
+      parameters:
+        - name: review_id
+          in: path
+          required: true
+          type: integer
+          description: Review ID of the review to update
+        - name: summary
+          in: formData
+          type: string
+          description: Summary of the user's thoughts of the book (max 300 char) to update
+        - name: rating
+          in: formData
+          type: integer
+          description: User's rating of the book out of 10 to update
+      responses:
+        200:
+          description: Review updated and redirects to the review page
+        400:
+          description: Review ID not provided or does not exist, or invalid input
+        401:
+          description: Unauthorized access
+          headers:
+            Location:
+              description: Login page
+              type: string
+              example: '/login'
+    delete:
+      summary: Delete a review
+      description: Deletes a review made by the current user.
+      tags:
+        - REVIEWS
+      parameters:
+        - name: review_id
+          in: path
+          required: true
+          type: integer
+          description: Review ID of the review to delete
+      responses:
+        200:
+          description: Review deleted successfully
+        400:
+          description: Review ID not provided or error in deletion
+        401:
+          description: Unauthorized access
+          headers:
+            Location:
+              description: Login page
+              type: string
+              example: '/login'
+
+  /reviews/create:
+    get:
+      summary: Create review page
+      description: Gets the page to create a new review.
+      tags:
+        - Pages
+      produces:
+        - text/html
+      responses:
+        200:
+          description: Page to create a new review
+        400:
+          description: No book ID provided
+        401:
+          description: Unauthorized access
+          headers:
+            Location:
+              description: Login page
+              type: string
+              example: '/login'
+
+  /reviews/{review_id}/update:
+    get:
+      summary: Get update review page
+      description: Returns the update review page, allowing the user to edit their review.
+      tags:
+        - Pages
+      produces:
+        - text/html
+      parameters:
+        - name: review_id
+          in: path
+          required: true
+          type: integer
+          description: Review ID of the review to update
+      responses:
+        200:
+          description: Page to update a review
+        400:
+          description: Review ID not provided
+        401:
+          description: Unauthorized access
+          headers:
+            Location:
+              description: Login page
+              type: string
+              example: '/login'
+
+  /reviews/:
+    get:
+      summary: Error handling for incorrect Review Endpoint Usage
+      description: Returns an error page for incorrect usage of the reviews endpoint.
+      tags:
+        - REVIEWS
+      produces:
+        - text/html
+      responses:
+        404:
+          description: Error message for missing review ID
+
+  /lists/search:
+    get:
+      summary: Search for lists
+      description: Search lists by the user's name or the list name. Returns the list search page with results.
+      tags:
+        - LISTS
+      produces:
+        - text/html
+      parameters:
+        - name: user_name
+          in: query
+          type: string
+          description: List creator's username, or part of it
+        - name: list_title
+          in: query
+          type: string
+          description: List's title, or part of it
+        - name: limit
+          in: query
+          type: integer
+          default: 100
+          description: Max number of results to return
+      responses:
+        200:
+          description: List search page with results
+        400:
+          description: Invalid input or limit must be an integer
+        401:
+          description: Unauthorized access
+          headers:
+            Location:
+              description: Login page
+              type: string
+              example: '/login'
+
+  /lists/{list_id}:
+    get:
+      summary: Get information of a specific list
+      description: Gets individual list page with information about the list.
+      tags:
+        - LISTS
+      produces:
+        - text/html
+      parameters:
+        - name: list_id
+          in: path
+          required: true
+          type: integer
+          description: List ID of the desired list
+      responses:
+        200:
+          description: Individual list page
+        400:
+          description: List ID not provided
+        401:
+          description: Unauthorized access
+          headers:
+            Location:
+              description: Login page
+              type: string
+              example: '/login'
+    post:
+      summary: Update a list
+      description: Updates the title or description of an existing list.
+      tags:
+        - LISTS
+      produces:
+        - text/html
+      parameters:
+        - name: list_id
+          in: path
+          required: true
+          type: integer
+          description: List ID of the list to update
+        - name: title
+          in: formData
+          type: string
+          description: Updated title
+        - name: description
+          in: formData
+          type: string
+          description: Updated description
+      responses:
+        302:
+          description: Redirects to the updated list page
+        400:
+          description: List ID not provided or invalid input
+        401:
+          description: Unauthorized access
+          headers:
+            Location:
+              description: Login page
+              type: string
+              example: '/login'
+    delete:
+      summary: Delete a list
+      description: Deletes an entire list created by the user.
+      tags:
+        - LISTS
+      parameters:
+        - name: list_id
+          in: path
+          required: true
+          type: integer
+          description: List ID of the list to delete
+      responses:
+        200:
+          description: List successfully deleted
+        400:
+          description: List ID not provided or error in deletion
+        401:
+          description: Unauthorized access
+          headers:
+            Location:
+              description: Login page
+              type: string
+              example: '/login'
+
+  /lists/create:
+    get:
+      summary: Get create list page
+      description: Gets the page to create a new list.
+      tags:
+        - Pages
+      produces:
+        - text/html
+      responses:
+        200:
+          description: Page to create a new list
+        401:
+          description: Unauthorized access
+          headers:
+            Location:
+              description: Login page
+              type: string
+              example: '/login'
+
+  /lists:
+    post:
+      summary: Create a list
+      description: Creates a new list authored by the current user.
+      tags:
+        - LISTS
+      produces:
+        - text/html
+      parameters:
+        - name: title
+          in: formData
+          type: string
+          required: true
+          description: Title of the new list. If empty, list will be named "Untitled"
+        - name: description
+          in: formData
+          type: string
+          description: Description of the new list. 
+      responses:
+        302:
+          description: Redirects to the new individual list page
+        400:
+          description: Invalid input or failed to create list
+        401:
+          description: Unauthorized access
+          headers:
+            Location:
+              description: Login page
+              type: string
+              example: '/login'
+
+  /lists/{list_id}/update:
+    get:
+      summary: Get update list page
+      description: Returns the page to update a list.
+      tags:
+        - Pages
+      produces:
+        - text/html
+      parameters:
+        - name: list_id
+          in: path
+          required: true
+          type: integer
+          description: List ID of the list to update
+      responses:
+        200:
+          description: Page to update a list
+        400:
+          description: List ID not provided
+        401:
+          description: Unauthorized access
+          headers:
+            Location:
+              description: Login page
+              type: string
+              example: '/login'
+
+  /lists/add/{book_id}:
+    post:
+      summary: Add book to a list
+      description: Adds a specified book to a given list.
+      tags:
+        - LISTS
+      produces:
+        - text/html
+      parameters:
+        - name: book_id
+          in: path
+          required: true
+          type: string
+          description: Book ID of the book to add
+        - name: list_id
+          in: formData
+          type: integer
+          required: true
+          description: List ID of the list to add book to
+      responses:
+        302:
+          description: Redirects to the updated list page
+        400:
+          description: List ID not provided or error in adding book
+        401:
+          description: Unauthorized access
+          headers:
+            Location:
+              description: Login page
+              type: string
+              example: '/login'
+
+  /lists/delete/{book_id}:
+    delete:
+      summary: Delete book from a list
+      description: Removes a specified book from a given list.
+      tags:
+        - LISTS
+      parameters:
+        - name: book_id
+          in: path
+          required: true
+          type: string
+          description: Book ID of the book to remove
+        - name: list_id
+          in: formData
+          type: integer
+          required: true
+          description: List ID of the list to remove book from
+      responses:
+        200:
+          description: Book successfully removed from list
+        400:
+          description: List ID not provided or error in removal
+        401:
+          description: Unauthorized access
+          headers:
+            Location:
+              description: Login page
+              type: string
+              example: '/login'
+
+tags:
+  - name: User Authentication
+    description: Endpoints for login and logout functionality
+  - name: Pages
+    description: Key pages of the application
+  - name: BOOKS
+    description: Endpoints for the Books resource
+  - name: AUTHORS
+    description: Endpoints for getting and searching authors
+  - name: USERS
+    description: Endpoints for the Users resource
+  - name: REVIEWS
+    description: Endpoints for the Reviews resource
+  - name: LISTS
+    description: Endpoints for the Lists resource
